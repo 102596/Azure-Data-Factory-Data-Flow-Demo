@@ -1,0 +1,294 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "finaldataflow001"
+		},
+		"integrationRuntime_integrationRuntime1": {
+			"value": "integrationRuntime1"
+		},
+		"integrationRuntime_integrationRuntime2": {
+			"value": "integrationRuntime2"
+		},
+		"integrationRuntime_integrationRuntime3": {
+			"value": "integrationRuntime3"
+		},
+		"integrationRuntime_selfhostedir": {
+			"value": "selfhostedir"
+		},
+		"ADB003_accessToken": {
+			"value": ""
+		},
+		"ADBOCT15_accessToken": {
+			"value": ""
+		},
+		"AzureBlobStorage1_connectionString": {
+			"value": ""
+		},
+		"AzureDataLakeStorage1_accountKey": {
+			"value": ""
+		},
+		"AzureDatabricks1_accessToken": {
+			"value": ""
+		},
+		"AzureSqlDW1_connectionString": {
+			"value": ""
+		},
+		"AzureSqlDW2_connectionString": {
+			"value": ""
+		},
+		"AzureSqlDatabase1_connectionString": {
+			"value": ""
+		},
+		"AzureSqlDatabase2_connectionString": {
+			"value": ""
+		},
+		"BaseballLS_connectionString": {
+			"value": ""
+		},
+		"DWDimProd_connectionString": {
+			"value": ""
+		},
+		"DataFlowLinkedService1_accessToken": {
+			"value": ""
+		},
+		"MyAzureBlobLinkedService_connectionString": {
+			"value": ""
+		},
+		"MyDataBricksLinkedService_accessToken": {
+			"value": ""
+		},
+		"SqlServer1_connectionString": {
+			"value": ""
+		},
+		"adb5_accessToken": {
+			"value": ""
+		},
+		"markjobcluster_accessToken": {
+			"value": ""
+		},
+		"myjobcluster_accessToken": {
+			"value": ""
+		},
+		"nov2_accessToken": {
+			"value": ""
+		},
+		"novinteractive_accessToken": {
+			"value": ""
+		},
+		"octinteractive_accessToken": {
+			"value": ""
+		},
+		"AzureBlob1_properties_typeProperties_fileName": {
+			"value": "SalesOrderDetail.csv"
+		},
+		"AzureBlob1_properties_typeProperties_folderPath": {
+			"value": "mycontainer/SampleData/AW"
+		},
+		"AzureBlob2_properties_typeProperties_fileName": {
+			"value": "movies*.csv"
+		},
+		"AzureBlob2_properties_typeProperties_folderPath": {
+			"value": "mycontainer/SampleData"
+		},
+		"AzureBlobBaseballOutput_properties_typeProperties_fileName": {
+			"value": ""
+		},
+		"AzureBlobBaseballOutput_properties_typeProperties_folderPath": {
+			"value": "mycontainer/output/baseball"
+		},
+		"BaseballBatting_properties_typeProperties_fileName": {
+			"value": "Batting.csv"
+		},
+		"BaseballBatting_properties_typeProperties_folderPath": {
+			"value": "mycontainer/SampleData/baseball"
+		},
+		"BattingSink_properties_typeProperties_fileName": {
+			"value": ""
+		},
+		"BattingSink_properties_typeProperties_folderPath": {
+			"value": "mycontainer/output/baseball"
+		},
+		"BlobStoreIncremental_properties_typeProperties_fileName": {
+			"value": "@CONCAT('Incremental-', pipeline().RunId, '.txt') "
+		},
+		"BlobStoreIncremental_properties_typeProperties_folderPath": {
+			"value": "mycontainer/incremental"
+		},
+		"CADOutput_properties_typeProperties_fileName": {
+			"value": ""
+		},
+		"CADOutput_properties_typeProperties_folderPath": {
+			"value": "mycontainer/output/currency"
+		},
+		"CurrencyDatasetCAD_properties_typeProperties_fileName": {
+			"value": "Currency_GBP.txt"
+		},
+		"CurrencyDatasetCAD_properties_typeProperties_folderPath": {
+			"value": "mycontainer/SampleData"
+		},
+		"CurrencyDatasetUSD_properties_typeProperties_fileName": {
+			"value": "Currency_USD.txt"
+		},
+		"CurrencyDatasetUSD_properties_typeProperties_folderPath": {
+			"value": "mycontainer/SampleData"
+		},
+		"DemoSinkDataset_properties_typeProperties_fileName": {
+			"value": ""
+		},
+		"DemoSinkDataset_properties_typeProperties_folderPath": {
+			"value": "mycontainer/output"
+		},
+		"DestinationDataset_5ra_properties_typeProperties_fileName": {
+			"value": ""
+		},
+		"DestinationDataset_5ra_properties_typeProperties_folderPath": {
+			"value": "somecontainer/markfolder"
+		},
+		"DestinationDataset_cce_properties_typeProperties_fileName": {
+			"value": ""
+		},
+		"DestinationDataset_cce_properties_typeProperties_folderPath": {
+			"value": "mycontainer/output/json"
+		},
+		"DestinationDataset_d2r_properties_typeProperties_fileName": {
+			"value": "myout.parquet"
+		},
+		"DestinationDataset_d2r_properties_typeProperties_folderPath": {
+			"value": "mycontainer/output/parquet"
+		},
+		"DestinationDataset_hii_properties_typeProperties_fileName": {
+			"value": "_committed_2034928433163805213"
+		},
+		"DestinationDataset_hii_properties_typeProperties_folderPath": {
+			"value": "mycontainer/output/sample"
+		},
+		"MoviesDBDataset_properties_typeProperties_fileName": {
+			"value": "moviesDB.csv"
+		},
+		"MoviesDBDataset_properties_typeProperties_folderPath": {
+			"value": "mycontainer/SampleData"
+		},
+		"PlayersBlob_properties_typeProperties_fileName": {
+			"value": "People.csv"
+		},
+		"PlayersBlob_properties_typeProperties_folderPath": {
+			"value": "mycontainer/SampleData/baseball"
+		},
+		"SourceDataset_cce_properties_typeProperties_fileName": {
+			"value": "customers.json"
+		},
+		"SourceDataset_cce_properties_typeProperties_folderPath": {
+			"value": "mycontainer/SampleData"
+		},
+		"SourceDataset_d2r_properties_typeProperties_fileName": {
+			"value": "Batting.csv"
+		},
+		"SourceDataset_d2r_properties_typeProperties_folderPath": {
+			"value": "mycontainer/SampleData/baseball"
+		},
+		"SourceDataset_hii_properties_typeProperties_fileName": {
+			"value": "Batting.csv"
+		},
+		"SourceDataset_hii_properties_typeProperties_folderPath": {
+			"value": "mycontainer/SampleData/baseball"
+		},
+		"TaxiDemoDayStatsSink_properties_typeProperties_fileName": {
+			"value": ""
+		},
+		"TaxiDemoDayStatsSink_properties_typeProperties_folderPath": {
+			"value": "mycontainer/output/dayout"
+		},
+		"TaxiDemoTotalByPaymentType_properties_typeProperties_fileName": {
+			"value": ""
+		},
+		"TaxiDemoTotalByPaymentType_properties_typeProperties_folderPath": {
+			"value": "mycontainer/output/taxipaymentout"
+		},
+		"TaxiDemoVendorStatsSink_properties_typeProperties_fileName": {
+			"value": ""
+		},
+		"TaxiDemoVendorStatsSink_properties_typeProperties_folderPath": {
+			"value": "mycontainer/output/vendorout"
+		},
+		"USDOutput_properties_typeProperties_fileName": {
+			"value": ""
+		},
+		"USDOutput_properties_typeProperties_folderPath": {
+			"value": "mycontainer/output/currency"
+		},
+		"driftout_properties_typeProperties_fileName": {
+			"value": ""
+		},
+		"driftout_properties_typeProperties_folderPath": {
+			"value": "mycontainer/output/SchemaDriftOut"
+		},
+		"jsonblob_properties_typeProperties_fileName": {
+			"value": "zips.json"
+		},
+		"jsonblob_properties_typeProperties_folderPath": {
+			"value": "mycontainer/SampleData"
+		},
+		"movie_dataflow_sink_properties_typeProperties_fileName": {
+			"value": ""
+		},
+		"movie_dataflow_sink_properties_typeProperties_folderPath": {
+			"value": "mycontainer/output"
+		},
+		"movie_dataflow_source_properties_typeProperties_fileName": {
+			"value": "movies.csv"
+		},
+		"movie_dataflow_source_properties_typeProperties_folderPath": {
+			"value": "mycontainer/SampleData"
+		},
+		"movies2_properties_typeProperties_fileName": {
+			"value": "movies.csv"
+		},
+		"movies2_properties_typeProperties_folderPath": {
+			"value": "mycontainer/SampleData"
+		},
+		"salesdrift_properties_typeProperties_fileName": {
+			"value": ""
+		},
+		"salesdrift_properties_typeProperties_folderPath": {
+			"value": "mycontainer/SampleData/SchemaDrift"
+		},
+		"taxi_trip_data_input_properties_typeProperties_fileName": {
+			"value": "trip_data_1.csv"
+		},
+		"taxi_trip_data_input_properties_typeProperties_folderPath": {
+			"value": "mycontainer/SampleData"
+		},
+		"taxi_trip_fare_input_properties_typeProperties_fileName": {
+			"value": "trip_fare_1.csv"
+		},
+		"taxi_trip_fare_input_properties_typeProperties_folderPath": {
+			"value": "mycontainer/SampleData"
+		},
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
+			"value": "https://ansgen2.dfs.core.windows.net"
+		},
+		"AzureDataLakeStore1_properties_typeProperties_dataLakeStoreUri": {
+			"value": "https://makadls001.azuredatalakestore.net/webhdfs/v1"
+		},
+		"AzureDataLakeStore1_properties_typeProperties_tenant": {
+			"value": "72f988bf-86f1-41af-91ab-2d7cd011db47"
+		},
+		"AzureDataLakeStore1_properties_typeProperties_subscriptionId": {
+			"value": "1e42591f-1f0c-4c5a-b7f2-a268f6105ec5"
+		},
+		"AzureDataLakeStore1_properties_typeProperties_resourceGroupName": {
+			"value": "makbricksadf"
+		},
+		"integrationRuntime2_properties_typeProperties_ssisProperties_catalogInfo_catalogServerEndpoint": {
+			"value": "makssis002.database.windows.net"
+		},
+		"integrationRuntime2_properties_typeProperties_ssisProperties_catalogInfo_catalogAdminUserName": {
+			"value": "kromerm"
+		},
+		"integrationRuntime2_properties_typeProperties_ssisProperties_catalogInfo_catalogAdminPassword": {
+			"value": ""
+		}
+	}
+}
