@@ -6274,24 +6274,23 @@
 						"typeProperties": {}
 					}
 				],
-				"sinks": [
-					{
-						"dataset": {
-							"referenceName": "DimProd",
-							"type": "DatasetReference"
-						},
-						"name": "sink1",
-						"script": "SurrogateKey1 sink(saveMode:'overwrite' , mapColumn(ProductKey,ProductAlternateKey,ProductSubcategoryKey,WeightUnitMeasureCode,SizeUnitMeasureCode,EnglishProductName,SpanishProductName,FrenchProductName,StandardCost = SQLProducts@StandardCost,FinishedGoodsFlag,Color = SQLProducts@Color,SafetyStockLevel,ReorderPoint,ListPrice = SQLProducts@ListPrice,Size = SQLProducts@Size,SizeRange,Weight = SQLProducts@Weight,DaysToManufacture,ProductLine,DealerPrice,Class,Style,ModelName,EnglishDescription,FrenchDescription,ChineseDescription,ArabicDescription,HebrewDescription,ThaiDescription,GermanDescription,JapaneseDescription,TurkishDescription,StartDate,EndDate,Status)) ~> sink1"
-					}
-				],
+				"sinks": [],
 				"transformations": [
 					{
-						"name": "Lookup1",
-						"script": "SQLProducts, DimProd lookup(ProductNumber == ProductAlternateKey,broadcast: 'none')~> Lookup1"
+						"name": "Join1",
+						"script": "SQLProducts, DimProd join(ProductID == ProductKey,joinType:'left',broadcast: 'none')~> Join1"
+					},
+					{
+						"name": "ConditionalSplit1",
+						"script": "Join1 split(isNull(ProductAlternateKey),disjoint: false) ~> ConditionalSplit1@(NewRow, ExistingMember)"
 					},
 					{
 						"name": "SurrogateKey1",
-						"script": "Lookup1 keyGenerate(output(ProductID as long),startAt: 1000L) ~> SurrogateKey1"
+						"script": "Select1 keyGenerate(output(surrogatekey as long),startAt: 1L) ~> SurrogateKey1"
+					},
+					{
+						"name": "Select1",
+						"script": "ConditionalSplit1@NewRow select(mapColumn(ProductID,Name,ProductNumber,ProductCategoryID,ProductModelID,SellStartDate,SellEndDate,DiscontinuedDate,ThumbNailPhoto,ThumbnailPhotoFileName,rowguid,ModifiedDate,ProductKey,ProductAlternateKey,ProductSubcategoryKey,WeightUnitMeasureCode,SizeUnitMeasureCode,EnglishProductName,SpanishProductName,FrenchProductName,StandardCost = Select1@{ConditionalSplit1@StandardCost},FinishedGoodsFlag,Color = Select1@{ConditionalSplit1@Color},SafetyStockLevel,ReorderPoint,ListPrice = Select1@{ConditionalSplit1@ListPrice},Size = Select1@{ConditionalSplit1@Size},SizeRange,Weight = Select1@{ConditionalSplit1@Weight},DaysToManufacture,ProductLine,DealerPrice,Class,Style,ModelName,EnglishDescription,FrenchDescription,ChineseDescription,ArabicDescription,HebrewDescription,ThaiDescription,GermanDescription,JapaneseDescription,TurkishDescription,StartDate,EndDate,Status))~> Select1"
 					}
 				],
 				"parameters": {}
