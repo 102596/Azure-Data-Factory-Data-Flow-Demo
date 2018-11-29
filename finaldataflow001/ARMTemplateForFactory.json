@@ -1376,6 +1376,96 @@
 				},
 				"annotations": [],
 				"type": "AzureSqlDWTable",
+				"structure": [
+					{
+						"name": "OrderTotal",
+						"type": "Decimal"
+					},
+					{
+						"name": "RevisionNumber",
+						"type": "String"
+					},
+					{
+						"name": "OrderDate",
+						"type": "DateTime"
+					},
+					{
+						"name": "DueDate",
+						"type": "DateTime"
+					},
+					{
+						"name": "ShipDate",
+						"type": "DateTime"
+					},
+					{
+						"name": "Status",
+						"type": "String"
+					},
+					{
+						"name": "OnlineOrderFlag",
+						"type": "Boolean"
+					},
+					{
+						"name": "SalesOrderNumber",
+						"type": "String"
+					},
+					{
+						"name": "PurchaseOrderNumber",
+						"type": "String"
+					},
+					{
+						"name": "AccountNumber",
+						"type": "String"
+					},
+					{
+						"name": "CustomerID",
+						"type": "Int32"
+					},
+					{
+						"name": "ShipToAddressID",
+						"type": "Int32"
+					},
+					{
+						"name": "BillToAddressID",
+						"type": "Int32"
+					},
+					{
+						"name": "ShipMethod",
+						"type": "String"
+					},
+					{
+						"name": "CreditCardApprovalCode",
+						"type": "String"
+					},
+					{
+						"name": "SubTotal",
+						"type": "Decimal"
+					},
+					{
+						"name": "TaxAmt",
+						"type": "Decimal"
+					},
+					{
+						"name": "Freight",
+						"type": "Decimal"
+					},
+					{
+						"name": "TotalDue",
+						"type": "Decimal"
+					},
+					{
+						"name": "Comment",
+						"type": "String"
+					},
+					{
+						"name": "rowguid",
+						"type": "String"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "DateTime"
+					}
+				],
 				"typeProperties": {
 					"tableName": "FactSales_makromer"
 				}
@@ -6121,6 +6211,39 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/MoviesDBDataset')]",
 				"[concat(variables('factoryId'), '/datasets/DemoSinkDataset')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SCD Dataflow 2')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"sources": [
+					{
+						"dataset": {
+							"referenceName": "ADW_FactSales",
+							"type": "DatasetReference"
+						},
+						"name": "source1",
+						"script": "source(output(OrderTotal as decimal(10,0),RevisionNumber as string,OrderDate as timestamp,DueDate as timestamp,ShipDate as timestamp,Status as string,OnlineOrderFlag as boolean,SalesOrderNumber as string,PurchaseOrderNumber as string,AccountNumber as string,CustomerID as integer,ShipToAddressID as integer,BillToAddressID as integer,ShipMethod as string,CreditCardApprovalCode as string,SubTotal as decimal(10,0),TaxAmt as decimal(10,0),Freight as decimal(10,0),TotalDue as decimal(10,0),Comment as string,rowguid as string,ModifiedDate as timestamp),allowSchemaDrift: false,validateSchema: false) ~> source1",
+						"typeProperties": {}
+					}
+				],
+				"sinks": [
+					{
+						"dataset": {
+							"referenceName": "ADW_FactSales",
+							"type": "DatasetReference"
+						},
+						"name": "sink1",
+						"script": "source1 sink(saveMode:'append' , mapColumn(OrderTotal,RevisionNumber,OrderDate,DueDate,ShipDate,Status,OnlineOrderFlag,SalesOrderNumber,PurchaseOrderNumber,AccountNumber,CustomerID,ShipToAddressID,BillToAddressID,ShipMethod,CreditCardApprovalCode,SubTotal,TaxAmt,Freight,TotalDue,Comment,rowguid,ModifiedDate)) ~> sink1"
+					}
+				],
+				"transformations": [],
+				"parameters": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ADW_FactSales')]"
 			]
 		},
 		{
