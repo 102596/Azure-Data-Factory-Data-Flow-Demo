@@ -1,0 +1,278 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory Name",
+			"defaultValue": "finaldataflow001"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/ADW_DimProduct')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDW1",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "ETL"
+				},
+				"type": "AzureSqlDWTable",
+				"structure": [
+					{
+						"name": "ProductKey",
+						"type": "Int32"
+					},
+					{
+						"name": "ProductAlternateKey",
+						"type": "String"
+					},
+					{
+						"name": "ProductSubcategoryKey",
+						"type": "Int32"
+					},
+					{
+						"name": "WeightUnitMeasureCode",
+						"type": "String"
+					},
+					{
+						"name": "SizeUnitMeasureCode",
+						"type": "String"
+					},
+					{
+						"name": "EnglishProductName",
+						"type": "String"
+					},
+					{
+						"name": "SpanishProductName",
+						"type": "String"
+					},
+					{
+						"name": "FrenchProductName",
+						"type": "String"
+					},
+					{
+						"name": "StandardCost",
+						"type": "Decimal"
+					},
+					{
+						"name": "FinishedGoodsFlag",
+						"type": "Boolean"
+					},
+					{
+						"name": "Color",
+						"type": "String"
+					},
+					{
+						"name": "SafetyStockLevel",
+						"type": "Int16"
+					},
+					{
+						"name": "ReorderPoint",
+						"type": "Int16"
+					},
+					{
+						"name": "ListPrice",
+						"type": "Decimal"
+					},
+					{
+						"name": "Size",
+						"type": "String"
+					},
+					{
+						"name": "SizeRange",
+						"type": "String"
+					},
+					{
+						"name": "Weight",
+						"type": "Double"
+					},
+					{
+						"name": "DaysToManufacture",
+						"type": "Int32"
+					},
+					{
+						"name": "ProductLine",
+						"type": "String"
+					},
+					{
+						"name": "DealerPrice",
+						"type": "Decimal"
+					},
+					{
+						"name": "Class",
+						"type": "String"
+					},
+					{
+						"name": "Style",
+						"type": "String"
+					},
+					{
+						"name": "ModelName",
+						"type": "String"
+					},
+					{
+						"name": "EnglishDescription",
+						"type": "String"
+					},
+					{
+						"name": "FrenchDescription",
+						"type": "String"
+					},
+					{
+						"name": "ChineseDescription",
+						"type": "String"
+					},
+					{
+						"name": "ArabicDescription",
+						"type": "String"
+					},
+					{
+						"name": "HebrewDescription",
+						"type": "String"
+					},
+					{
+						"name": "ThaiDescription",
+						"type": "String"
+					},
+					{
+						"name": "GermanDescription",
+						"type": "String"
+					},
+					{
+						"name": "JapaneseDescription",
+						"type": "String"
+					},
+					{
+						"name": "TurkishDescription",
+						"type": "String"
+					},
+					{
+						"name": "StartDate",
+						"type": "DateTime"
+					},
+					{
+						"name": "EndDate",
+						"type": "DateTime"
+					},
+					{
+						"name": "Status",
+						"type": "String"
+					}
+				],
+				"typeProperties": {
+					"tableName": "DimProduct"
+				}
+			}
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SQLProducts')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"type": "AzureSqlTable",
+				"structure": [
+					{
+						"name": "ProductID",
+						"type": "Int32"
+					},
+					{
+						"name": "Name",
+						"type": "String"
+					},
+					{
+						"name": "ProductNumber",
+						"type": "String"
+					},
+					{
+						"name": "Color",
+						"type": "String"
+					},
+					{
+						"name": "StandardCost",
+						"type": "Decimal"
+					},
+					{
+						"name": "ListPrice",
+						"type": "Decimal"
+					},
+					{
+						"name": "Size",
+						"type": "String"
+					},
+					{
+						"name": "Weight",
+						"type": "Decimal"
+					}
+				],
+				"typeProperties": {
+					"tableName": "salesprod"
+				}
+			}
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SCDType2')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Demos"
+				},
+				"sources": [
+					{
+						"dataset": {
+							"referenceName": "SQLProducts",
+							"type": "DatasetReference"
+						},
+						"name": "SQLProducts",
+						"script": "source(output(ProductID as integer,Name as string,ProductNumber as string,Color as string,StandardCost as decimal(10,0),ListPrice as decimal(10,0),Size as string,Weight as decimal(10,0)),allowSchemaDrift: false,validateSchema: false) ~> SQLProducts"
+					},
+					{
+						"dataset": {
+							"referenceName": "DimProd",
+							"type": "DatasetReference"
+						},
+						"name": "DimProd",
+						"script": "source(output(ProductKey as integer,ProductAlternateKey as string,ProductSubcategoryKey as integer,WeightUnitMeasureCode as string,SizeUnitMeasureCode as string,EnglishProductName as string,SpanishProductName as string,FrenchProductName as string,StandardCost as decimal(10,0),FinishedGoodsFlag as boolean,Color as string,SafetyStockLevel as short,ReorderPoint as short,ListPrice as decimal(10,0),Size as string,SizeRange as string,Weight as double,DaysToManufacture as integer,ProductLine as string,DealerPrice as decimal(10,0),Class as string,Style as string,ModelName as string,EnglishDescription as string,FrenchDescription as string,ChineseDescription as string,ArabicDescription as string,HebrewDescription as string,ThaiDescription as string,GermanDescription as string,JapaneseDescription as string,TurkishDescription as string,StartDate as timestamp,EndDate as timestamp,Status as string),allowSchemaDrift: false,validateSchema: false) ~> DimProd"
+					}
+				],
+				"transformations": [
+					{
+						"name": "LookupKeys",
+						"script": "SQLProducts, DimProd join(ProductID == ProductKey,joinType:'left',broadcast: 'none')~> LookupKeys"
+					},
+					{
+						"name": "ConditionalSplit1",
+						"script": "ColumnSelection split(isNull(ProductAlternateKey),disjoint: false) ~> ConditionalSplit1@(NewRow, ExistingMember)"
+					},
+					{
+						"name": "SurrogateKey1",
+						"script": "ConditionalSplit1@NewRow keyGenerate(output(surrogatekey as long),startAt: 1L) ~> SurrogateKey1"
+					},
+					{
+						"name": "ColumnSelection",
+						"script": "LookupKeys select(mapColumn(ProductID,Name,ProductNumber,Color = SQLProducts@Color,StandardCost = SQLProducts@StandardCost,ListPrice = SQLProducts@ListPrice,Size = SQLProducts@Size,Weight = SQLProducts@Weight,ProductKey,ProductAlternateKey,ProductSubcategoryKey,WeightUnitMeasureCode,SizeUnitMeasureCode,EnglishProductName,SpanishProductName,FrenchProductName,FinishedGoodsFlag,SafetyStockLevel,ReorderPoint,SizeRange,DaysToManufacture,ProductLine,DealerPrice,Class,Style,ModelName,EnglishDescription,FrenchDescription,ChineseDescription,ArabicDescription,HebrewDescription,ThaiDescription,GermanDescription,JapaneseDescription,TurkishDescription,StartDate,EndDate,Status))~> ColumnSelection"
+					},
+					{
+						"name": "SetAttributes",
+						"script": "SurrogateKey1 derive(surrogatekey = concat('abcd', toString(surrogatekey)),Status = 'Y',StartDate = currentDate(),EndDate = addMonths(currentDate(),1200),NullDesc = toString('  ')) ~> SetAttributes"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/SQLProducts')]"
+			]
+		}
+	]
+}

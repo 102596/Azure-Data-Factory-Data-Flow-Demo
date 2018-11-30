@@ -1354,8 +1354,150 @@
 				},
 				"annotations": [],
 				"type": "AzureSqlDWTable",
+				"structure": [
+					{
+						"name": "ProductKey",
+						"type": "Int32"
+					},
+					{
+						"name": "ProductAlternateKey",
+						"type": "String"
+					},
+					{
+						"name": "ProductSubcategoryKey",
+						"type": "Int32"
+					},
+					{
+						"name": "WeightUnitMeasureCode",
+						"type": "String"
+					},
+					{
+						"name": "SizeUnitMeasureCode",
+						"type": "String"
+					},
+					{
+						"name": "EnglishProductName",
+						"type": "String"
+					},
+					{
+						"name": "SpanishProductName",
+						"type": "String"
+					},
+					{
+						"name": "FrenchProductName",
+						"type": "String"
+					},
+					{
+						"name": "StandardCost",
+						"type": "Decimal"
+					},
+					{
+						"name": "FinishedGoodsFlag",
+						"type": "Boolean"
+					},
+					{
+						"name": "Color",
+						"type": "String"
+					},
+					{
+						"name": "SafetyStockLevel",
+						"type": "Int16"
+					},
+					{
+						"name": "ReorderPoint",
+						"type": "Int16"
+					},
+					{
+						"name": "ListPrice",
+						"type": "Decimal"
+					},
+					{
+						"name": "Size",
+						"type": "String"
+					},
+					{
+						"name": "SizeRange",
+						"type": "String"
+					},
+					{
+						"name": "Weight",
+						"type": "Double"
+					},
+					{
+						"name": "DaysToManufacture",
+						"type": "Int32"
+					},
+					{
+						"name": "ProductLine",
+						"type": "String"
+					},
+					{
+						"name": "DealerPrice",
+						"type": "Decimal"
+					},
+					{
+						"name": "Class",
+						"type": "String"
+					},
+					{
+						"name": "Style",
+						"type": "String"
+					},
+					{
+						"name": "ModelName",
+						"type": "String"
+					},
+					{
+						"name": "EnglishDescription",
+						"type": "String"
+					},
+					{
+						"name": "FrenchDescription",
+						"type": "String"
+					},
+					{
+						"name": "ChineseDescription",
+						"type": "String"
+					},
+					{
+						"name": "ArabicDescription",
+						"type": "String"
+					},
+					{
+						"name": "HebrewDescription",
+						"type": "String"
+					},
+					{
+						"name": "ThaiDescription",
+						"type": "String"
+					},
+					{
+						"name": "GermanDescription",
+						"type": "String"
+					},
+					{
+						"name": "JapaneseDescription",
+						"type": "String"
+					},
+					{
+						"name": "TurkishDescription",
+						"type": "String"
+					},
+					{
+						"name": "StartDate",
+						"type": "DateTime"
+					},
+					{
+						"name": "EndDate",
+						"type": "DateTime"
+					},
+					{
+						"name": "Status",
+						"type": "String"
+					}
+				],
 				"typeProperties": {
-					"tableName": "DimProduct_makromer"
+					"tableName": "DimProduct"
 				}
 			},
 			"dependsOn": [
@@ -3873,42 +4015,6 @@
 					{
 						"name": "Weight",
 						"type": "Decimal"
-					},
-					{
-						"name": "ProductCategoryID",
-						"type": "Int32"
-					},
-					{
-						"name": "ProductModelID",
-						"type": "Int32"
-					},
-					{
-						"name": "SellStartDate",
-						"type": "DateTime"
-					},
-					{
-						"name": "SellEndDate",
-						"type": "DateTime"
-					},
-					{
-						"name": "DiscontinuedDate",
-						"type": "DateTime"
-					},
-					{
-						"name": "ThumbNailPhoto",
-						"type": "Byte[]"
-					},
-					{
-						"name": "ThumbnailPhotoFileName",
-						"type": "String"
-					},
-					{
-						"name": "rowguid",
-						"type": "Guid"
-					},
-					{
-						"name": "ModifiedDate",
-						"type": "DateTime"
 					}
 				],
 				"typeProperties": {
@@ -6264,7 +6370,7 @@
 							"type": "DatasetReference"
 						},
 						"name": "SQLProducts",
-						"script": "source(output(ProductID as integer,Name as string,ProductNumber as string,Color as string,StandardCost as decimal(10,0),ListPrice as decimal(10,0),Size as string,Weight as decimal(10,0),ProductCategoryID as integer,ProductModelID as integer,SellStartDate as timestamp,SellEndDate as timestamp,DiscontinuedDate as timestamp,ThumbNailPhoto as string,ThumbnailPhotoFileName as string,rowguid as string,ModifiedDate as timestamp),allowSchemaDrift: false,validateSchema: false) ~> SQLProducts",
+						"script": "source(output(ProductID as integer,Name as string,ProductNumber as string,Color as string,StandardCost as decimal(10,0),ListPrice as decimal(10,0),Size as string,Weight as decimal(10,0)),allowSchemaDrift: false,validateSchema: false) ~> SQLProducts",
 						"typeProperties": {}
 					},
 					{
@@ -6277,16 +6383,7 @@
 						"typeProperties": {}
 					}
 				],
-				"sinks": [
-					{
-						"dataset": {
-							"referenceName": "ADW_DimProduct",
-							"type": "DatasetReference"
-						},
-						"name": "sink1",
-						"script": "NameKey sink(saveMode:'append' , mapColumn(ProductID,Name,ProductNumber,Color,StandardCost,ListPrice,Weight,ProductCategoryID,ProductModelID,SellStartDate,SellEndDate,DiscontinuedDate,ThumbNailPhoto,ThumbnailPhotoFileName,rowguid,ModifiedDate,ProductKey,ProductAlternateKey = surrogatekey,ProductSubcategoryKey,WeightUnitMeasureCode,SizeUnitMeasureCode,EnglishProductName,SpanishProductName,FrenchProductName,FinishedGoodsFlag,SafetyStockLevel,ReorderPoint,SizeRange,DaysToManufacture,ProductLine,DealerPrice,Class,Style,ModelName,EnglishDescription,FrenchDescription,ChineseDescription,ArabicDescription,HebrewDescription,ThaiDescription,GermanDescription,JapaneseDescription,TurkishDescription,StartDate,EndDate,Status)) ~> sink1"
-					}
-				],
+				"sinks": [],
 				"transformations": [
 					{
 						"name": "LookupKeys",
@@ -6302,19 +6399,18 @@
 					},
 					{
 						"name": "ColumnSelection",
-						"script": "LookupKeys select(mapColumn(ProductID,Name,ProductNumber,Color = SQLProducts@Color,StandardCost = SQLProducts@StandardCost,ListPrice = SQLProducts@ListPrice,Size = SQLProducts@Size,Weight = SQLProducts@Weight,ProductCategoryID,ProductModelID,SellStartDate,SellEndDate,DiscontinuedDate,ThumbNailPhoto,ThumbnailPhotoFileName,rowguid,ModifiedDate,ProductKey,ProductAlternateKey,ProductSubcategoryKey,WeightUnitMeasureCode,SizeUnitMeasureCode,EnglishProductName,SpanishProductName,FrenchProductName,FinishedGoodsFlag,SafetyStockLevel,ReorderPoint,SizeRange,DaysToManufacture,ProductLine,DealerPrice,Class,Style,ModelName,EnglishDescription,FrenchDescription,ChineseDescription,ArabicDescription,HebrewDescription,ThaiDescription,GermanDescription,JapaneseDescription,TurkishDescription,StartDate,EndDate,Status))~> ColumnSelection"
+						"script": "LookupKeys select(mapColumn(ProductID,Name,ProductNumber,Color = SQLProducts@Color,StandardCost = SQLProducts@StandardCost,ListPrice = SQLProducts@ListPrice,Size = SQLProducts@Size,Weight = SQLProducts@Weight,ProductKey,ProductAlternateKey,ProductSubcategoryKey,WeightUnitMeasureCode,SizeUnitMeasureCode,EnglishProductName,SpanishProductName,FrenchProductName,FinishedGoodsFlag,SafetyStockLevel,ReorderPoint,SizeRange,DaysToManufacture,ProductLine,DealerPrice,Class,Style,ModelName,EnglishDescription,FrenchDescription,ChineseDescription,ArabicDescription,HebrewDescription,ThaiDescription,GermanDescription,JapaneseDescription,TurkishDescription,StartDate,EndDate,Status))~> ColumnSelection"
 					},
 					{
-						"name": "NameKey",
-						"script": "SurrogateKey1 derive(surrogatekey = concat('abcd', toString(surrogatekey))) ~> NameKey"
+						"name": "SetAttributes",
+						"script": "SurrogateKey1 derive(surrogatekey = concat('abcd', toString(surrogatekey)),Status = 'Y',StartDate = currentDate(),EndDate = addMonths(currentDate(),1200),NullDesc = toString('  ')) ~> SetAttributes"
 					}
 				],
 				"parameters": {}
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/SQLProducts')]",
-				"[concat(variables('factoryId'), '/datasets/DimProd')]",
-				"[concat(variables('factoryId'), '/datasets/ADW_DimProduct')]"
+				"[concat(variables('factoryId'), '/datasets/DimProd')]"
 			]
 		},
 		{
