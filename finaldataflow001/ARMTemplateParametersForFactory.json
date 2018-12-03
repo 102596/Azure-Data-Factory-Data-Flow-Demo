@@ -65,6 +65,9 @@
 		"adb5_accessToken": {
 			"value": ""
 		},
+		"databricksJobCluster_accessToken": {
+			"value": ""
+		},
 		"markjobcluster_accessToken": {
 			"value": ""
 		},

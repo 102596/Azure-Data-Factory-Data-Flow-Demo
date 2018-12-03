@@ -91,6 +91,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accessToken' of 'adb5'"
 		},
+		"databricksJobCluster_accessToken": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accessToken' of 'databricksJobCluster'"
+		},
 		"markjobcluster_accessToken": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accessToken' of 'markjobcluster'"
@@ -419,7 +423,7 @@
 								"type": "DataFlowReference"
 							},
 							"linkedService": {
-								"referenceName": "nov2",
+								"referenceName": "databricksJobCluster",
 								"type": "LinkedServiceReference"
 							},
 							"staging": {
@@ -439,7 +443,7 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/dataflows/Baseball 1 Norm Batting Stats')]",
-				"[concat(variables('factoryId'), '/linkedServices/nov2')]",
+				"[concat(variables('factoryId'), '/linkedServices/databricksJobCluster')]",
 				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage1')]"
 			]
 		},
@@ -5615,6 +5619,26 @@
 						"value": "[parameters('adb5_accessToken')]"
 					},
 					"existingClusterId": "1117-020042-femur647"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/databricksJobCluster')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureDatabricks",
+				"typeProperties": {
+					"domain": "https://westus.azuredatabricks.net",
+					"accessToken": {
+						"type": "SecureString",
+						"value": "[parameters('databricksJobCluster_accessToken')]"
+					},
+					"newClusterNodeType": "Standard_DS3_v2",
+					"newClusterNumOfWorker": "2",
+					"newClusterVersion": "4.3.x-scala2.11"
 				}
 			},
 			"dependsOn": []
