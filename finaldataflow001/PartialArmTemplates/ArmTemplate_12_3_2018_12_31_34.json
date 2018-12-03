@@ -1,0 +1,100 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory Name",
+			"defaultValue": "finaldataflow001"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/BaseballPipeline')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Baseball 1 Norm Batting Stats",
+						"type": "ExecuteDataFlow",
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "Baseball 1 Norm Batting Stats",
+								"type": "DataFlowReference"
+							},
+							"linkedService": {
+								"referenceName": "nov2",
+								"type": "LinkedServiceReference"
+							},
+							"staging": {
+								"linkedService": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"folderPath": "mycontainer/staging"
+							}
+						}
+					}
+				],
+				"folder": {
+					"name": "Baseball"
+				}
+			}
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MovieDemo')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Demos"
+				},
+				"sources": [
+					{
+						"dataset": {
+							"referenceName": "movie_dataflow_source",
+							"type": "DatasetReference"
+						},
+						"name": "Movies",
+						"script": "source(output(movieId as string,title as string,genres as string,dummy as string),allowSchemaDrift: true,validateSchema: false) ~> Movies"
+					}
+				],
+				"sinks": [
+					{
+						"dataset": {
+							"referenceName": "AzureSqlDWTable2",
+							"type": "DatasetReference"
+						},
+						"name": "Output",
+						"script": "MoviesAfter1980 sink(saveMode:'overwrite' ) ~> Output"
+					}
+				],
+				"transformations": [
+					{
+						"name": "MoviesYear",
+						"script": "SplitGenres derive(year = toInteger(trim(right(title, 6), '()')),title = toString(left(title, length(title)-6))) ~> MoviesYear"
+					},
+					{
+						"name": "MoviesAfter1980",
+						"script": "MoviesYear filter(year > 1980) ~> MoviesAfter1980"
+					},
+					{
+						"name": "SplitGenres",
+						"script": "Movies derive(splitgenres = split(genres, '|')) ~> SplitGenres"
+					}
+				]
+			}
+		}
+	]
+}

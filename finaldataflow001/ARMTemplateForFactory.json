@@ -396,6 +396,54 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/BaseballPipeline')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Baseball 1 Norm Batting Stats",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "Baseball 1 Norm Batting Stats",
+								"type": "DataFlowReference"
+							},
+							"linkedService": {
+								"referenceName": "nov2",
+								"type": "LinkedServiceReference"
+							},
+							"staging": {
+								"linkedService": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"folderPath": "mycontainer/staging"
+							}
+						}
+					}
+				],
+				"folder": {
+					"name": "Baseball"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/Baseball 1 Norm Batting Stats')]",
+				"[concat(variables('factoryId'), '/linkedServices/nov2')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage1')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Controller Daily Analytics Loader')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-07-01-preview",
@@ -6314,11 +6362,7 @@
 					},
 					{
 						"name": "SplitGenres",
-						"script": "Filter1 derive(splitgenres = split(genres, '|')) ~> SplitGenres"
-					},
-					{
-						"name": "Filter1",
-						"script": "Movies filter(isNull(dummy)) ~> Filter1"
+						"script": "Movies derive(splitgenres = split(genres, '|')) ~> SplitGenres"
 					}
 				],
 				"parameters": {}
