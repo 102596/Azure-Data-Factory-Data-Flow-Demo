@@ -1,0 +1,1328 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory Name",
+			"defaultValue": "datafloweast"
+		},
+		"SourceDataset_cce_properties_typeProperties_fileName": {
+			"type": "string",
+			"defaultValue": "customers.json"
+		},
+		"SourceDataset_cce_properties_typeProperties_folderPath": {
+			"type": "string",
+			"defaultValue": "mycontainer/SampleData"
+		},
+		"SourceDataset_d2r_properties_typeProperties_fileName": {
+			"type": "string",
+			"defaultValue": "Batting.csv"
+		},
+		"SourceDataset_d2r_properties_typeProperties_folderPath": {
+			"type": "string",
+			"defaultValue": "mycontainer/SampleData/baseball"
+		},
+		"SourceDataset_hii_properties_typeProperties_fileName": {
+			"type": "string",
+			"defaultValue": "Batting.csv"
+		},
+		"SourceDataset_hii_properties_typeProperties_folderPath": {
+			"type": "string",
+			"defaultValue": "mycontainer/SampleData/baseball"
+		},
+		"TaxiDemoDayStatsSink_properties_typeProperties_fileName": {
+			"type": "string",
+			"defaultValue": ""
+		},
+		"TaxiDemoDayStatsSink_properties_typeProperties_folderPath": {
+			"type": "string",
+			"defaultValue": "mycontainer/output/taxipaymentout"
+		},
+		"TaxiDemoTotalByPaymentType_properties_typeProperties_fileName": {
+			"type": "string",
+			"defaultValue": ""
+		},
+		"TaxiDemoTotalByPaymentType_properties_typeProperties_folderPath": {
+			"type": "string",
+			"defaultValue": "mycontainer/output/taxipaymentout"
+		},
+		"TaxiDemoVendorStatsSink_properties_typeProperties_fileName": {
+			"type": "string",
+			"defaultValue": ""
+		},
+		"TaxiDemoVendorStatsSink_properties_typeProperties_folderPath": {
+			"type": "string",
+			"defaultValue": "mycontainer/output/vendorout"
+		},
+		"USDOutput_properties_typeProperties_fileName": {
+			"type": "string",
+			"defaultValue": ""
+		},
+		"USDOutput_properties_typeProperties_folderPath": {
+			"type": "string",
+			"defaultValue": "mycontainer/output/currency"
+		},
+		"blob_params_properties_typeProperties_fileName": {
+			"type": "string",
+			"defaultValue": "params-red.csv"
+		},
+		"blob_params_properties_typeProperties_folderPath": {
+			"type": "string",
+			"defaultValue": "mycontainer/SampleData"
+		},
+		"driftout_properties_typeProperties_fileName": {
+			"type": "string",
+			"defaultValue": ""
+		},
+		"driftout_properties_typeProperties_folderPath": {
+			"type": "string",
+			"defaultValue": "mycontainer/output/SchemaDriftOut"
+		},
+		"jsonblob_properties_typeProperties_fileName": {
+			"type": "string",
+			"defaultValue": "zips.json"
+		},
+		"jsonblob_properties_typeProperties_folderPath": {
+			"type": "string",
+			"defaultValue": "mycontainer/SampleData"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/SQLDBBaseball1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Baseball"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"typeProperties": {
+					"tableName": "batting1"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SQLDBBaseball2')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Baseball"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"structure": [
+					{
+						"name": "BA",
+						"type": "Double"
+					},
+					{
+						"name": "OBP",
+						"type": "Double"
+					},
+					{
+						"name": "SLG",
+						"type": "Double"
+					},
+					{
+						"name": "TB",
+						"type": "Int32"
+					},
+					{
+						"name": "birthYear",
+						"type": "String"
+					},
+					{
+						"name": "birthMonth",
+						"type": "String"
+					},
+					{
+						"name": "birthDay",
+						"type": "String"
+					},
+					{
+						"name": "birthCountry",
+						"type": "String"
+					},
+					{
+						"name": "birthState",
+						"type": "String"
+					},
+					{
+						"name": "birthCity",
+						"type": "String"
+					},
+					{
+						"name": "deathYear",
+						"type": "String"
+					},
+					{
+						"name": "deathMonth",
+						"type": "String"
+					},
+					{
+						"name": "deathDay",
+						"type": "String"
+					},
+					{
+						"name": "deathCountry",
+						"type": "String"
+					},
+					{
+						"name": "deathState",
+						"type": "String"
+					},
+					{
+						"name": "deathCity",
+						"type": "String"
+					},
+					{
+						"name": "nameFirst",
+						"type": "String"
+					},
+					{
+						"name": "nameLast",
+						"type": "String"
+					},
+					{
+						"name": "nameGiven",
+						"type": "String"
+					},
+					{
+						"name": "weight",
+						"type": "String"
+					},
+					{
+						"name": "height",
+						"type": "String"
+					},
+					{
+						"name": "bats",
+						"type": "String"
+					},
+					{
+						"name": "throws",
+						"type": "String"
+					},
+					{
+						"name": "debut",
+						"type": "String"
+					},
+					{
+						"name": "finalGame",
+						"type": "String"
+					},
+					{
+						"name": "retroID",
+						"type": "String"
+					},
+					{
+						"name": "bbrefID",
+						"type": "String"
+					},
+					{
+						"name": "playerID",
+						"type": "String"
+					},
+					{
+						"name": "yearID",
+						"type": "String"
+					},
+					{
+						"name": "stint",
+						"type": "String"
+					},
+					{
+						"name": "teamID",
+						"type": "String"
+					},
+					{
+						"name": "lgID",
+						"type": "String"
+					},
+					{
+						"name": "G",
+						"type": "Int32"
+					},
+					{
+						"name": "AB",
+						"type": "Int32"
+					},
+					{
+						"name": "R",
+						"type": "Int32"
+					},
+					{
+						"name": "H",
+						"type": "Int32"
+					},
+					{
+						"name": "H2B",
+						"type": "Int32"
+					},
+					{
+						"name": "H3B",
+						"type": "Int32"
+					},
+					{
+						"name": "HR",
+						"type": "Int32"
+					},
+					{
+						"name": "RBI",
+						"type": "Int32"
+					},
+					{
+						"name": "SB",
+						"type": "Int32"
+					},
+					{
+						"name": "CS",
+						"type": "Int32"
+					},
+					{
+						"name": "BB",
+						"type": "Int32"
+					},
+					{
+						"name": "SO",
+						"type": "Int32"
+					},
+					{
+						"name": "IBB",
+						"type": "Int32"
+					},
+					{
+						"name": "HBP",
+						"type": "Int32"
+					},
+					{
+						"name": "SH",
+						"type": "Int32"
+					},
+					{
+						"name": "SF",
+						"type": "Int32"
+					},
+					{
+						"name": "GIDP",
+						"type": "Int32"
+					}
+				],
+				"typeProperties": {
+					"tableName": "batting1"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SQLDB_ProdCat')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "ETL"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"structure": [
+					{
+						"name": "ProductCategoryID",
+						"type": "Int32"
+					},
+					{
+						"name": "ParentProductCategoryID",
+						"type": "Int32"
+					},
+					{
+						"name": "Name",
+						"type": "String"
+					},
+					{
+						"name": "rowguid",
+						"type": "Guid"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "DateTime"
+					}
+				],
+				"typeProperties": {
+					"tableName": "[concat('[', 'SalesLT].[ProductCategory]')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SQLDB_Products')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "ETL"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"structure": [
+					{
+						"name": "ProductID",
+						"type": "Int32"
+					},
+					{
+						"name": "Name",
+						"type": "String"
+					},
+					{
+						"name": "ProductNumber",
+						"type": "String"
+					},
+					{
+						"name": "Color",
+						"type": "String"
+					},
+					{
+						"name": "StandardCost",
+						"type": "Decimal"
+					},
+					{
+						"name": "ListPrice",
+						"type": "Decimal"
+					},
+					{
+						"name": "Size",
+						"type": "String"
+					},
+					{
+						"name": "Weight",
+						"type": "Decimal"
+					},
+					{
+						"name": "ProductCategoryID",
+						"type": "Int32"
+					},
+					{
+						"name": "ProductModelID",
+						"type": "Int32"
+					},
+					{
+						"name": "SellStartDate",
+						"type": "DateTime"
+					},
+					{
+						"name": "SellEndDate",
+						"type": "DateTime"
+					},
+					{
+						"name": "DiscontinuedDate",
+						"type": "DateTime"
+					},
+					{
+						"name": "ThumbNailPhoto",
+						"type": "Byte[]"
+					},
+					{
+						"name": "ThumbnailPhotoFileName",
+						"type": "String"
+					},
+					{
+						"name": "rowguid",
+						"type": "Guid"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "DateTime"
+					}
+				],
+				"typeProperties": {
+					"tableName": "[concat('[', 'SalesLT].[Product]')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SQLDB_SalesDetail')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "ETL"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"structure": [
+					{
+						"name": "SalesOrderID",
+						"type": "Int32"
+					},
+					{
+						"name": "SalesOrderDetailID",
+						"type": "Int32"
+					},
+					{
+						"name": "OrderQty",
+						"type": "Int16"
+					},
+					{
+						"name": "ProductID",
+						"type": "Int32"
+					},
+					{
+						"name": "UnitPrice",
+						"type": "Decimal"
+					},
+					{
+						"name": "UnitPriceDiscount",
+						"type": "Decimal"
+					},
+					{
+						"name": "LineTotal",
+						"type": "Decimal"
+					},
+					{
+						"name": "rowguid",
+						"type": "Guid"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "DateTime"
+					}
+				],
+				"typeProperties": {
+					"tableName": "[concat('[', 'SalesLT].[SalesOrderDetail]')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SQLDB_SalesHeader')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "ETL"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"structure": [
+					{
+						"name": "SalesOrderID",
+						"type": "Int32"
+					},
+					{
+						"name": "RevisionNumber",
+						"type": "Byte"
+					},
+					{
+						"name": "OrderDate",
+						"type": "DateTime"
+					},
+					{
+						"name": "DueDate",
+						"type": "DateTime"
+					},
+					{
+						"name": "ShipDate",
+						"type": "DateTime"
+					},
+					{
+						"name": "Status",
+						"type": "Byte"
+					},
+					{
+						"name": "OnlineOrderFlag",
+						"type": "Boolean"
+					},
+					{
+						"name": "SalesOrderNumber",
+						"type": "String"
+					},
+					{
+						"name": "PurchaseOrderNumber",
+						"type": "String"
+					},
+					{
+						"name": "AccountNumber",
+						"type": "String"
+					},
+					{
+						"name": "CustomerID",
+						"type": "Int32"
+					},
+					{
+						"name": "ShipToAddressID",
+						"type": "Int32"
+					},
+					{
+						"name": "BillToAddressID",
+						"type": "Int32"
+					},
+					{
+						"name": "ShipMethod",
+						"type": "String"
+					},
+					{
+						"name": "CreditCardApprovalCode",
+						"type": "String"
+					},
+					{
+						"name": "SubTotal",
+						"type": "Decimal"
+					},
+					{
+						"name": "TaxAmt",
+						"type": "Decimal"
+					},
+					{
+						"name": "Freight",
+						"type": "Decimal"
+					},
+					{
+						"name": "TotalDue",
+						"type": "Decimal"
+					},
+					{
+						"name": "Comment",
+						"type": "String"
+					},
+					{
+						"name": "rowguid",
+						"type": "Guid"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "DateTime"
+					}
+				],
+				"typeProperties": {
+					"tableName": "[concat('[', 'SalesLT].[SalesOrderHeader]')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SQLProducts')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Demos"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"structure": [
+					{
+						"name": "ProductID",
+						"type": "Int32"
+					},
+					{
+						"name": "Name",
+						"type": "String"
+					},
+					{
+						"name": "ProductNumber",
+						"type": "String"
+					},
+					{
+						"name": "Color",
+						"type": "String"
+					},
+					{
+						"name": "StandardCost",
+						"type": "Decimal"
+					},
+					{
+						"name": "ListPrice",
+						"type": "Decimal"
+					},
+					{
+						"name": "Size",
+						"type": "String"
+					},
+					{
+						"name": "Weight",
+						"type": "Decimal"
+					}
+				],
+				"typeProperties": {
+					"tableName": "salesprod"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SourceDataset_cce')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Copy"
+				},
+				"annotations": [],
+				"type": "AzureBlob",
+				"structure": [
+					{
+						"name": "customerID",
+						"type": "String"
+					},
+					{
+						"name": "companyName",
+						"type": "String"
+					},
+					{
+						"name": "contactName",
+						"type": "String"
+					},
+					{
+						"name": "contactTitle",
+						"type": "String"
+					},
+					{
+						"name": "address.street",
+						"type": "String"
+					},
+					{
+						"name": "address.city",
+						"type": "String"
+					},
+					{
+						"name": "address.region",
+						"type": "String"
+					},
+					{
+						"name": "address.postalCode",
+						"type": "String"
+					},
+					{
+						"name": "address.country",
+						"type": "String"
+					},
+					{
+						"name": "address.phone",
+						"type": "String"
+					}
+				],
+				"typeProperties": {
+					"format": {
+						"type": "JsonFormat",
+						"filePattern": "arrayOfObjects",
+						"jsonPathDefinition": {
+							"customerID": "$.['customerID']",
+							"companyName": "$.['companyName']",
+							"contactName": "$.['contactName']",
+							"contactTitle": "$.['contactTitle']",
+							"address.street": "$.['address']['street']",
+							"address.city": "$.['address']['city']",
+							"address.region": "$.['address']['region']",
+							"address.postalCode": "$.['address']['postalCode']",
+							"address.country": "$.['address']['country']",
+							"address.phone": "$.['address']['phone']"
+						}
+					},
+					"fileName": "[parameters('SourceDataset_cce_properties_typeProperties_fileName')]",
+					"folderPath": "[parameters('SourceDataset_cce_properties_typeProperties_folderPath')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SourceDataset_d2r')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Copy"
+				},
+				"annotations": [],
+				"type": "AzureBlob",
+				"structure": [
+					{
+						"name": "playerID",
+						"type": "String"
+					},
+					{
+						"name": "yearID",
+						"type": "Int64"
+					},
+					{
+						"name": "stint",
+						"type": "Int64"
+					},
+					{
+						"name": "teamID",
+						"type": "String"
+					},
+					{
+						"name": "lgID",
+						"type": "String"
+					},
+					{
+						"name": "G",
+						"type": "Int64"
+					},
+					{
+						"name": "AB",
+						"type": "Int64"
+					},
+					{
+						"name": "R",
+						"type": "Int64"
+					},
+					{
+						"name": "H",
+						"type": "Int64"
+					},
+					{
+						"name": "H2B",
+						"type": "Int64"
+					},
+					{
+						"name": "H3B",
+						"type": "Int64"
+					},
+					{
+						"name": "HR",
+						"type": "Int64"
+					},
+					{
+						"name": "RBI",
+						"type": "Int64"
+					},
+					{
+						"name": "SB",
+						"type": "Int64"
+					},
+					{
+						"name": "CS",
+						"type": "Int64"
+					},
+					{
+						"name": "BB",
+						"type": "Int64"
+					},
+					{
+						"name": "SO",
+						"type": "Int64"
+					},
+					{
+						"name": "IBB",
+						"type": "String"
+					},
+					{
+						"name": "HBP",
+						"type": "String"
+					},
+					{
+						"name": "SH",
+						"type": "String"
+					},
+					{
+						"name": "SF",
+						"type": "String"
+					},
+					{
+						"name": "GIDP",
+						"type": "Int64"
+					}
+				],
+				"typeProperties": {
+					"format": {
+						"type": "TextFormat",
+						"columnDelimiter": ",",
+						"rowDelimiter": "",
+						"nullValue": "\\N",
+						"encodingName": null,
+						"treatEmptyAsNull": true,
+						"skipLineCount": 0,
+						"firstRowAsHeader": true
+					},
+					"fileName": "[parameters('SourceDataset_d2r_properties_typeProperties_fileName')]",
+					"folderPath": "[parameters('SourceDataset_d2r_properties_typeProperties_folderPath')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SourceDataset_hii')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Copy"
+				},
+				"annotations": [],
+				"type": "AzureBlob",
+				"structure": [
+					{
+						"name": "playerID",
+						"type": "String"
+					},
+					{
+						"name": "yearID",
+						"type": "Int64"
+					},
+					{
+						"name": "stint",
+						"type": "Int64"
+					},
+					{
+						"name": "teamID",
+						"type": "String"
+					},
+					{
+						"name": "lgID",
+						"type": "String"
+					},
+					{
+						"name": "G",
+						"type": "Int64"
+					},
+					{
+						"name": "AB",
+						"type": "Int64"
+					},
+					{
+						"name": "R",
+						"type": "Int64"
+					},
+					{
+						"name": "H",
+						"type": "Int64"
+					},
+					{
+						"name": "H2B",
+						"type": "Int64"
+					},
+					{
+						"name": "H3B",
+						"type": "Int64"
+					},
+					{
+						"name": "HR",
+						"type": "Int64"
+					},
+					{
+						"name": "RBI",
+						"type": "Int64"
+					},
+					{
+						"name": "SB",
+						"type": "Int64"
+					},
+					{
+						"name": "CS",
+						"type": "Int64"
+					},
+					{
+						"name": "BB",
+						"type": "Int64"
+					},
+					{
+						"name": "SO",
+						"type": "Int64"
+					},
+					{
+						"name": "IBB",
+						"type": "String"
+					},
+					{
+						"name": "HBP",
+						"type": "String"
+					},
+					{
+						"name": "SH",
+						"type": "String"
+					},
+					{
+						"name": "SF",
+						"type": "String"
+					},
+					{
+						"name": "GIDP",
+						"type": "Int64"
+					}
+				],
+				"typeProperties": {
+					"format": {
+						"type": "TextFormat",
+						"columnDelimiter": ",",
+						"rowDelimiter": "",
+						"nullValue": "\\N",
+						"encodingName": null,
+						"treatEmptyAsNull": true,
+						"skipLineCount": 0,
+						"firstRowAsHeader": true
+					},
+					"fileName": "[parameters('SourceDataset_hii_properties_typeProperties_fileName')]",
+					"folderPath": "[parameters('SourceDataset_hii_properties_typeProperties_folderPath')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/TaxiDemoDayStatsSink')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "MyAzureBlobLinkedService",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Demos"
+				},
+				"annotations": [],
+				"type": "AzureBlob",
+				"typeProperties": {
+					"format": {
+						"type": "TextFormat",
+						"columnDelimiter": ",",
+						"rowDelimiter": "",
+						"nullValue": "\\N",
+						"treatEmptyAsNull": true,
+						"skipLineCount": 0,
+						"firstRowAsHeader": true
+					},
+					"fileName": "[parameters('TaxiDemoDayStatsSink_properties_typeProperties_fileName')]",
+					"folderPath": "[parameters('TaxiDemoDayStatsSink_properties_typeProperties_folderPath')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/TaxiDemoTotalByPaymentType')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "MyAzureBlobLinkedService",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Demos"
+				},
+				"annotations": [],
+				"type": "AzureBlob",
+				"typeProperties": {
+					"format": {
+						"type": "TextFormat",
+						"columnDelimiter": ",",
+						"rowDelimiter": "",
+						"nullValue": "\\N",
+						"treatEmptyAsNull": true,
+						"skipLineCount": 0,
+						"firstRowAsHeader": false
+					},
+					"fileName": "[parameters('TaxiDemoTotalByPaymentType_properties_typeProperties_fileName')]",
+					"folderPath": "[parameters('TaxiDemoTotalByPaymentType_properties_typeProperties_folderPath')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/TaxiDemoVendorStatsSink')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "MyAzureBlobLinkedService",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Demos"
+				},
+				"annotations": [],
+				"type": "AzureBlob",
+				"typeProperties": {
+					"format": {
+						"type": "TextFormat",
+						"columnDelimiter": ",",
+						"rowDelimiter": "",
+						"nullValue": "\\N",
+						"treatEmptyAsNull": true,
+						"skipLineCount": 0,
+						"firstRowAsHeader": false
+					},
+					"fileName": "[parameters('TaxiDemoVendorStatsSink_properties_typeProperties_fileName')]",
+					"folderPath": "[parameters('TaxiDemoVendorStatsSink_properties_typeProperties_folderPath')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/USDOutput')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "MyAzureBlobLinkedService",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Demos"
+				},
+				"annotations": [],
+				"type": "AzureBlob",
+				"typeProperties": {
+					"format": {
+						"type": "TextFormat",
+						"columnDelimiter": ",",
+						"rowDelimiter": "",
+						"nullValue": "\\N",
+						"treatEmptyAsNull": true,
+						"skipLineCount": 0,
+						"firstRowAsHeader": false
+					},
+					"fileName": "[parameters('USDOutput_properties_typeProperties_fileName')]",
+					"folderPath": "[parameters('USDOutput_properties_typeProperties_folderPath')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/airlines')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase3",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"structure": [
+					{
+						"name": "Code",
+						"type": "Int32"
+					},
+					{
+						"name": "Airline_Code",
+						"type": "String"
+					}
+				],
+				"typeProperties": {
+					"tableName": "[concat('[', 'dbo].[Airline]')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/airports')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase3",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"structure": [
+					{
+						"name": "Code",
+						"type": "String"
+					},
+					{
+						"name": "City_Airport",
+						"type": "String"
+					}
+				],
+				"typeProperties": {
+					"tableName": "[concat('[', 'dbo].[Airport]')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/blob_params')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Params"
+				},
+				"annotations": [],
+				"type": "AzureBlob",
+				"structure": [
+					{
+						"name": "Prop_0",
+						"type": "String"
+					}
+				],
+				"typeProperties": {
+					"format": {
+						"type": "TextFormat",
+						"columnDelimiter": ",",
+						"rowDelimiter": "",
+						"nullValue": "\\N",
+						"encodingName": null,
+						"treatEmptyAsNull": true,
+						"skipLineCount": 0,
+						"firstRowAsHeader": false
+					},
+					"fileName": "[parameters('blob_params_properties_typeProperties_fileName')]",
+					"folderPath": "[parameters('blob_params_properties_typeProperties_folderPath')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/delays')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase3",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"structure": [
+					{
+						"name": "carrier",
+						"type": "String"
+					},
+					{
+						"name": "year",
+						"type": "Int32"
+					},
+					{
+						"name": "delays",
+						"type": "Int32"
+					}
+				],
+				"typeProperties": {
+					"tableName": "[concat('[', 'dbo].[delays]')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/driftout')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "MyAzureBlobLinkedService",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Drifts"
+				},
+				"annotations": [],
+				"type": "AzureBlob",
+				"typeProperties": {
+					"format": {
+						"type": "TextFormat",
+						"columnDelimiter": ",",
+						"rowDelimiter": "",
+						"nullValue": "\\N",
+						"treatEmptyAsNull": true,
+						"skipLineCount": 0,
+						"firstRowAsHeader": false
+					},
+					"fileName": "[parameters('driftout_properties_typeProperties_fileName')]",
+					"folderPath": "[parameters('driftout_properties_typeProperties_folderPath')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/jsonblob')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "MyAzureBlobLinkedService",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Misc"
+				},
+				"annotations": [],
+				"type": "AzureBlob",
+				"structure": [
+					{
+						"name": "_id",
+						"type": "String"
+					},
+					{
+						"name": "city",
+						"type": "String"
+					},
+					{
+						"name": "loc",
+						"type": "String"
+					},
+					{
+						"name": "pop",
+						"type": "Int64"
+					},
+					{
+						"name": "state",
+						"type": "String"
+					}
+				],
+				"typeProperties": {
+					"format": {
+						"type": "JsonFormat",
+						"filePattern": "setOfObjects"
+					},
+					"fileName": "[parameters('jsonblob_properties_typeProperties_fileName')]",
+					"folderPath": "[parameters('jsonblob_properties_typeProperties_folderPath')]"
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}

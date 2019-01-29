@@ -1,0 +1,858 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory Name",
+			"defaultValue": "datafloweast"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/pivotflow2')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"sources": [
+					{
+						"dataset": {
+							"referenceName": "Product_Blob",
+							"type": "DatasetReference"
+						},
+						"name": "ProductSource",
+						"script": "source(output(\n\t\tProductID as string,\n\t\tName as string,\n\t\tProductNumber as string,\n\t\tColor as string,\n\t\tStandardCost as decimal(10,0),\n\t\tListPrice as string,\n\t\tSize as string,\n\t\tWeight as string,\n\t\tProductCategoryID as string,\n\t\tProductModelID as string\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> ProductSource",
+						"typeProperties": {}
+					}
+				],
+				"sinks": [],
+				"transformations": [
+					{
+						"name": "PivotColorStandardCost",
+						"script": "ProductSource pivot(groupBy(Name,\n\t\tProductID),\n\tpivotBy(Color),\n\tCostSum = sum(StandardCost),\n\tcolumnNaming: '$N$V',\n\tlateral: true) ~> PivotColorStandardCost"
+					},
+					{
+						"name": "ProductSourceBranch",
+						"script": "ProductSource select(mapColumn(\n\t\tProductID2 = ProductID,\n\t\tName,\n\t\tProductNumber,\n\t\tColor,\n\t\tStandardCost,\n\t\tListPrice,\n\t\tSize,\n\t\tWeight,\n\t\tProductCategoryID,\n\t\tProductModelID\n\t))~> ProductSourceBranch"
+					},
+					{
+						"name": "Join1",
+						"script": "PivotColorStandardCost, ProductSourceBranch join(ProductID == ProductID2,\n\tjoinType:'inner',\n\tbroadcast: 'none')~> Join1"
+					}
+				],
+				"parameters": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/regexflow')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"sources": [
+					{
+						"dataset": {
+							"referenceName": "Addresses_Blob",
+							"type": "DatasetReference"
+						},
+						"name": "IncomingAddresses",
+						"script": "source(output(\n\t\tAddressID as string,\n\t\tAddress1 as string,\n\t\tAddress2 as string,\n\t\tCity as string,\n\t\tProp_4 as string,\n\t\tProp_5 as string,\n\t\tProp_6 as string,\n\t\tProp_7 as string,\n\t\tProp_8 as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> IncomingAddresses",
+						"typeProperties": {}
+					}
+				],
+				"sinks": [
+					{
+						"dataset": {
+							"referenceName": "A_G",
+							"type": "DatasetReference"
+						},
+						"name": "sink1",
+						"script": "ConditionalSplit1@AThruG sink(saveMode:'overwrite') ~> sink1"
+					},
+					{
+						"dataset": {
+							"referenceName": "H_P",
+							"type": "DatasetReference"
+						},
+						"name": "sink2",
+						"script": "ConditionalSplit1@HThruP sink(saveMode:'overwrite') ~> sink2"
+					},
+					{
+						"dataset": {
+							"referenceName": "Q_Z",
+							"type": "DatasetReference"
+						},
+						"name": "sink3",
+						"script": "ConditionalSplit1@QThruZ sink(saveMode:'overwrite') ~> sink3"
+					},
+					{
+						"dataset": {
+							"referenceName": "others",
+							"type": "DatasetReference"
+						},
+						"name": "sink4",
+						"script": "ConditionalSplit1@other sink(saveMode:'overwrite') ~> sink4"
+					}
+				],
+				"transformations": [
+					{
+						"name": "CleanAddress",
+						"script": "IncomingAddresses derive(clean_address = regexReplace(Address1,`[ ]{2}|\\.`,' '),\n\t\thouse_num = regex_extract(Address1, `^(\\d+)`, 1)) ~> CleanAddress"
+					},
+					{
+						"name": "ConditionalSplit1",
+						"script": "CleanAddress split(rlike(City,'^[A-G]'),\n\trlike(City,'^[H-P]'),\n\trlike(City,'^[Q-Z]'),\n\tdisjoint: false) ~> ConditionalSplit1@(AThruG, HThruP, QThruZ, other)"
+					}
+				],
+				"parameters": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/soccerETL')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Soccer"
+				},
+				"sources": [
+					{
+						"dataset": {
+							"referenceName": "soccer_events",
+							"type": "DatasetReference"
+						},
+						"name": "SpecifySchemaExtract",
+						"script": "source(output(\n\t\tid_odsp as string,\n\t\tid_event as string,\n\t\tsort_order as integer,\n\t\ttime as integer,\n\t\ttext as string,\n\t\tevent_type as string,\n\t\tevent_type2 as string,\n\t\tside as string,\n\t\tevent_team as string,\n\t\topponent as string,\n\t\tplayer as string,\n\t\tplayer2 as string,\n\t\tplayer_in as string,\n\t\tplayer_out as string,\n\t\tshot_place as string,\n\t\tshot_outcome as string,\n\t\tis_goal as string,\n\t\tlocation as string,\n\t\tbodypart as string,\n\t\tassist_method as string,\n\t\tsituation as string,\n\t\tfast_break as string\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> SpecifySchemaExtract",
+						"typeProperties": {}
+					},
+					{
+						"dataset": {
+							"referenceName": "locationMap",
+							"type": "DatasetReference"
+						},
+						"name": "locationMap",
+						"script": "source(output(\n\t\tType as string,\n\t\tName as string\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> locationMap",
+						"typeProperties": {}
+					}
+				],
+				"sinks": [
+					{
+						"dataset": {
+							"referenceName": "driftout",
+							"type": "DatasetReference"
+						},
+						"name": "sinkToDW",
+						"script": "TimeBins sink(saveMode:'overwrite') ~> sinkToDW"
+					}
+				],
+				"transformations": [
+					{
+						"name": "DictionaryMapping1",
+						"script": "SpecifySchemaExtract derive(eventTypeMap = case(\r\n    event_type == '0','Announcement',\r\n    event_type == '1','Attempt',\r\n    event_type == '2','Corner',\r\n    event_type == '3','Foul',\r\n    event_type == '4','Yellow Card',\r\n    event_type == '5','Second yellow card',\r\n    event_type == '6','Red card',\r\n    event_type == '7','Substitution',\r\n    event_type == '8','Free kick won',\r\n    event_type == '9','Offside',\r\n    event_type == '10','Hand ball',\r\n    event_type == '11','Penalty conceded',\r\n    event_type == '99', 'NA'\r\n),\n\t\ttime = toInteger(time)) ~> DictionaryMapping1"
+					},
+					{
+						"name": "JoinStringDataViaLookup",
+						"script": "DictionaryMapping1, locationMap lookup(location == Type,\n\tbroadcast: 'none')~> JoinStringDataViaLookup"
+					},
+					{
+						"name": "TimeBins",
+						"script": "ColumnSelectionNaming window(over(time),\n\tasc(event_type2, true),\n\tTimeBins = rowNumber()) ~> TimeBins"
+					},
+					{
+						"name": "ColumnSelectionNaming",
+						"script": "JoinStringDataViaLookup select(mapColumn(\n\t\tid_odsp,\n\t\tid_event,\n\t\tsort_order,\n\t\ttime,\n\t\ttext,\n\t\tevent_type2,\n\t\tside,\n\t\tevent_team,\n\t\topponent,\n\t\tplayer,\n\t\tplayer2,\n\t\tplayer_in,\n\t\tplayer_out,\n\t\tshot_place,\n\t\tshot_outcome,\n\t\tis_goal,\n\t\tlocation,\n\t\tbodypart,\n\t\tassist_method,\n\t\tsituation,\n\t\tfast_break,\n\t\teventTypeName = eventTypeMap,\n\t\tLocationName = Name\n\t))~> ColumnSelectionNaming"
+					}
+				],
+				"parameters": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/BaseballPipeline')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Baseball 1 Norm Batting Stats",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "Baseball 1 Norm Batting Stats",
+								"type": "DataFlowReference",
+								"datasetParameters": {
+									"sourceBatting": {},
+									"sourcePlayer": {},
+									"sink1": {}
+								}
+							},
+							"linkedService": {
+								"referenceName": "JAN2019EAST",
+								"type": "LinkedServiceReference"
+							},
+							"staging": {
+								"linkedService": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"folderPath": "mycontainer/staging"
+							}
+						}
+					}
+				],
+				"folder": {
+					"name": "Baseball"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/BaseballPipeline2')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Baseball 1 Norm Batting Stats",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "Baseball 1 Norm Batting Stats",
+								"type": "DataFlowReference",
+								"datasetParameters": {
+									"sourceBatting": {},
+									"sourcePlayer": {},
+									"sink1": {}
+								}
+							},
+							"linkedService": {
+								"referenceName": "adb5_jan_eastus",
+								"type": "LinkedServiceReference"
+							},
+							"staging": {
+								"linkedService": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"folderPath": "mycontainer/staging"
+							}
+						}
+					}
+				],
+				"folder": {
+					"name": "Demos"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Currency Converter')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Convert Currencies",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "Currency Converter",
+								"type": "DataFlowReference",
+								"datasetParameters": {
+									"USDCurrency": {},
+									"CADSource": {},
+									"USDSink": {},
+									"CADSink": {}
+								}
+							},
+							"linkedService": {
+								"referenceName": "MyDataBricksLinkedService",
+								"type": "LinkedServiceReference"
+							},
+							"staging": {}
+						}
+					}
+				],
+				"folder": {
+					"name": "Demos"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MovieDemoPipeline')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "ExecuteMovieDemoDataFlow",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "MovieDemo",
+								"type": "DataFlowReference",
+								"datasetParameters": {
+									"Movies": {},
+									"Output": {}
+								}
+							},
+							"linkedService": {
+								"referenceName": "MyDataBricksLinkedService",
+								"type": "LinkedServiceReference"
+							},
+							"staging": {
+								"linkedService": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"folderPath": "mycontainer/staging"
+							}
+						}
+					}
+				],
+				"folder": {
+					"name": "Demos"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SCD Pipeline')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "SCDType2",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "SCDType2",
+								"type": "DataFlowReference",
+								"datasetParameters": {
+									"SQLProducts": {},
+									"DimProd": {},
+									"sink1": {}
+								}
+							},
+							"linkedService": {
+								"referenceName": "JAN2019EAST",
+								"type": "LinkedServiceReference"
+							},
+							"staging": {
+								"linkedService": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"folderPath": "mycontainer/staging"
+							}
+						}
+					}
+				],
+				"folder": {
+					"name": "Demos"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Schema Drift Pipeline')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "SchemaDrift",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "SchemaDrift",
+								"type": "DataFlowReference",
+								"datasetParameters": {
+									"SalesSource1": {},
+									"sink1": {}
+								}
+							},
+							"linkedService": {
+								"referenceName": "JAN2019EAST",
+								"type": "LinkedServiceReference"
+							},
+							"staging": {}
+						}
+					}
+				],
+				"folder": {
+					"name": "Drifts"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SoccerETL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "soccerETL",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "Baseball 1 Basic Stats",
+								"type": "DataFlowReference",
+								"datasetParameters": {
+									"sourceBatting": {},
+									"sourcePlayer": {},
+									"sink1": {}
+								}
+							},
+							"linkedService": {
+								"referenceName": "JAN2019EAST",
+								"type": "LinkedServiceReference"
+							},
+							"staging": {
+								"linkedService": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"folderPath": "mycontainer/staging"
+							}
+						}
+					}
+				],
+				"folder": {
+					"name": "Demos"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/TaxiDemo')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "TaxiDemoDataflow",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "TaxiDemo",
+								"type": "DataFlowReference",
+								"datasetParameters": {
+									"TripData": {},
+									"TripFare": {},
+									"VendorStatsSink": {},
+									"DayStatsSink": {},
+									"TotalPaymentByPaymentType": {}
+								}
+							},
+							"linkedService": {
+								"referenceName": "JAN2019EAST",
+								"type": "LinkedServiceReference"
+							},
+							"staging": {
+								"linkedService": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"folderPath": "mycontainter/staging"
+							}
+						}
+					}
+				],
+				"folder": {
+					"name": "Demos"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/masterPipeline')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "MyExecutePipelineActivity",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "invokedPipeline",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"sourceBlobContainer": {
+									"value": "@pipeline().parameters.masterSourceBlobContainer",
+									"type": "Expression"
+								},
+								"sinkBlobCountainer": {
+									"value": "@pipeline().parameters.masterSinkBlobContainer",
+									"type": "Expression"
+								}
+							}
+						}
+					}
+				],
+				"parameters": {
+					"masterSourceBlobContainer": {
+						"type": "String"
+					},
+					"masterSinkBlobContainer": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "PipelineController"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline2')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "dataflow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "SCDType2",
+								"type": "DataFlowReference",
+								"datasetParameters": {
+									"SQLProducts": {},
+									"DimProd": {},
+									"sink1": {}
+								}
+							},
+							"linkedService": {
+								"referenceName": "JAN2019EAST",
+								"type": "LinkedServiceReference"
+							},
+							"staging": {
+								"linkedService": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"folderPath": "mycontainer/staging"
+							}
+						}
+					}
+				],
+				"folder": {
+					"name": "Misc"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline3')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Baseball 2 Adv Stats",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "Baseball 2 Adv Stats",
+								"type": "DataFlowReference",
+								"datasetParameters": {
+									"source1": {},
+									"sink1": {}
+								}
+							},
+							"linkedService": {
+								"referenceName": "JAN2019EAST",
+								"type": "LinkedServiceReference"
+							},
+							"staging": {
+								"linkedService": {
+									"referenceName": "MyAzureBlobLinkedService",
+									"type": "LinkedServiceReference"
+								},
+								"folderPath": "mycontainer/staging"
+							}
+						}
+					}
+				],
+				"folder": {
+					"name": "Misc"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline4')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Currency Converter",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "Currency Converter",
+								"type": "DataFlowReference",
+								"datasetParameters": {
+									"USDCurrency": {},
+									"CADSource": {},
+									"USDSink": {},
+									"CADSink": {}
+								}
+							},
+							"linkedService": {
+								"referenceName": "JAN2019EAST",
+								"type": "LinkedServiceReference"
+							},
+							"staging": {
+								"linkedService": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								}
+							}
+						}
+					}
+				],
+				"folder": {
+					"name": "Misc"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline7')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Data Flow",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "TaxiDemoLarge",
+								"type": "DataFlowReference",
+								"datasetParameters": {
+									"TripData": {},
+									"TripFare": {},
+									"VendorStatsSink": {},
+									"DayStatsSink": {},
+									"TotalPaymentByPaymentType": {}
+								}
+							},
+							"linkedService": {
+								"referenceName": "adbls002",
+								"type": "LinkedServiceReference"
+							},
+							"staging": {}
+						}
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Controller Daily Analytics Loader')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Incremental Data Lake Loading",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "My Incremental Pipeline",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true
+						}
+					},
+					{
+						"name": "Daily Sales Summaries and Cals",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Incremental Data Lake Loading",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Currency Converter",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true
+						}
+					},
+					{
+						"name": "Load Data Stores",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Daily Sales Summaries and Cals",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "ETL Final Stage",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"issuccess": "1"
+							}
+						}
+					}
+				],
+				"folder": {
+					"name": "PipelineController"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/Currency Converter')]"
+			]
+		}
+	]
+}
