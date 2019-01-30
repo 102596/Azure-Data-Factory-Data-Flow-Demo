@@ -7,11 +7,6 @@
 			"metadata": "Data Factory Name",
 			"defaultValue": "datafloweast"
 		},
-		"integrationRuntime_integrationRuntime1": {
-			"type": "string",
-			"metadata": "Integration Runtime Name",
-			"defaultValue": "integrationRuntime1"
-		},
 		"AzureBlobStorage1_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage1'"
@@ -67,6 +62,10 @@
 		"MyDataBricksLinkedService_accessToken": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accessToken' of 'MyDataBricksLinkedService'"
+		},
+		"TaxiDataSQLDB_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'TaxiDataSQLDB'"
 		},
 		"adb5_jan_eastus_accessToken": {
 			"type": "secureString",
@@ -358,6 +357,19 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/TaxiDataSQLDB')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('TaxiDataSQLDB_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/adb5_jan_eastus')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-07-01-preview",
@@ -410,16 +422,6 @@
 					"newClusterNumOfWorker": "2",
 					"newClusterVersion": "4.3.x-scala2.11"
 				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/', parameters('integrationRuntime_integrationRuntime1'))]",
-			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
-			"apiVersion": "2018-07-01-preview",
-			"properties": {
-				"type": "SelfHosted",
-				"typeProperties": {}
 			},
 			"dependsOn": []
 		}

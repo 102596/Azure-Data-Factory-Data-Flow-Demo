@@ -13,41 +13,6 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/pivotflow2')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-07-01-preview",
-			"properties": {
-				"sources": [
-					{
-						"dataset": {
-							"referenceName": "Product_Blob",
-							"type": "DatasetReference"
-						},
-						"name": "ProductSource",
-						"script": "source(output(\n\t\tProductID as string,\n\t\tName as string,\n\t\tProductNumber as string,\n\t\tColor as string,\n\t\tStandardCost as decimal(10,0),\n\t\tListPrice as string,\n\t\tSize as string,\n\t\tWeight as string,\n\t\tProductCategoryID as string,\n\t\tProductModelID as string\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> ProductSource",
-						"typeProperties": {}
-					}
-				],
-				"sinks": [],
-				"transformations": [
-					{
-						"name": "PivotColorStandardCost",
-						"script": "ProductSource pivot(groupBy(Name,\n\t\tProductID),\n\tpivotBy(Color),\n\tCostSum = sum(StandardCost),\n\tcolumnNaming: '$N$V',\n\tlateral: true) ~> PivotColorStandardCost"
-					},
-					{
-						"name": "ProductSourceBranch",
-						"script": "ProductSource select(mapColumn(\n\t\tProductID2 = ProductID,\n\t\tName,\n\t\tProductNumber,\n\t\tColor,\n\t\tStandardCost,\n\t\tListPrice,\n\t\tSize,\n\t\tWeight,\n\t\tProductCategoryID,\n\t\tProductModelID\n\t))~> ProductSourceBranch"
-					},
-					{
-						"name": "Join1",
-						"script": "PivotColorStandardCost, ProductSourceBranch join(ProductID == ProductID2,\n\tjoinType:'inner',\n\tbroadcast: 'none')~> Join1"
-					}
-				],
-				"parameters": {}
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/regexflow')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-07-01-preview",
@@ -142,7 +107,7 @@
 				"sinks": [
 					{
 						"dataset": {
-							"referenceName": "driftout",
+							"referenceName": "AzureBlobBaseballOutput",
 							"type": "DatasetReference"
 						},
 						"name": "sinkToDW",
@@ -160,7 +125,7 @@
 					},
 					{
 						"name": "TimeBins",
-						"script": "ColumnSelectionNaming window(over(time),\n\tasc(event_type2, true),\n\tTimeBins = rowNumber()) ~> TimeBins"
+						"script": "ColumnSelectionNaming window(over(time),\n\tasc(event_type2, true),\n\tTimeBins = nTile(10)) ~> TimeBins"
 					},
 					{
 						"name": "ColumnSelectionNaming",

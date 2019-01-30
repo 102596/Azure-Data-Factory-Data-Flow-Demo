@@ -83,6 +83,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accessToken' of 'MyDataBricksLinkedService'"
 		},
+		"TaxiDataSQLDB_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'TaxiDataSQLDB'"
+		},
 		"adb5_jan_eastus_accessToken": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accessToken' of 'adb5_jan_eastus'"
@@ -94,10 +98,6 @@
 		"databricksJobCluster_accessToken": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accessToken' of 'databricksJobCluster'"
-		},
-		"TaxiDataSQLDB_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'TaxiDataSQLDB'"
 		},
 		"A_G_properties_typeProperties_fileName": {
 			"type": "string",
@@ -449,9 +449,6 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
-					"integrationRuntime_integrationRuntime1": {
-						"value": "[parameters('integrationRuntime_integrationRuntime1')]"
-					},
 					"AzureBlobStorage1_connectionString": {
 						"value": "[parameters('AzureBlobStorage1_connectionString')]"
 					},
@@ -494,6 +491,9 @@
 					"MyDataBricksLinkedService_accessToken": {
 						"value": "[parameters('MyDataBricksLinkedService_accessToken')]"
 					},
+					"TaxiDataSQLDB_connectionString": {
+						"value": "[parameters('TaxiDataSQLDB_connectionString')]"
+					},
 					"adb5_jan_eastus_accessToken": {
 						"value": "[parameters('adb5_jan_eastus_accessToken')]"
 					},
@@ -521,6 +521,9 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
+					"integrationRuntime_integrationRuntime1": {
+						"value": "[parameters('integrationRuntime_integrationRuntime1')]"
+					},
 					"integrationRuntime_integrationRuntime2": {
 						"value": "[parameters('integrationRuntime_integrationRuntime2')]"
 					},
@@ -529,9 +532,6 @@
 					},
 					"integrationRuntime_selfhostedir": {
 						"value": "[parameters('integrationRuntime_selfhostedir')]"
-					},
-					"TaxiDataSQLDB_connectionString": {
-						"value": "[parameters('TaxiDataSQLDB_connectionString')]"
 					},
 					"integrationRuntime2_properties_typeProperties_ssisProperties_catalogInfo_catalogServerEndpoint": {
 						"value": "[parameters('integrationRuntime2_properties_typeProperties_ssisProperties_catalogInfo_catalogServerEndpoint')]"
@@ -749,18 +749,6 @@
 					},
 					"blob_params_properties_typeProperties_folderPath": {
 						"value": "[parameters('blob_params_properties_typeProperties_folderPath')]"
-					},
-					"driftout_properties_typeProperties_fileName": {
-						"value": "[parameters('driftout_properties_typeProperties_fileName')]"
-					},
-					"driftout_properties_typeProperties_folderPath": {
-						"value": "[parameters('driftout_properties_typeProperties_folderPath')]"
-					},
-					"jsonblob_properties_typeProperties_fileName": {
-						"value": "[parameters('jsonblob_properties_typeProperties_fileName')]"
-					},
-					"jsonblob_properties_typeProperties_folderPath": {
-						"value": "[parameters('jsonblob_properties_typeProperties_folderPath')]"
 					}
 				}
 			},
@@ -781,6 +769,18 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"driftout_properties_typeProperties_fileName": {
+						"value": "[parameters('driftout_properties_typeProperties_fileName')]"
+					},
+					"driftout_properties_typeProperties_folderPath": {
+						"value": "[parameters('driftout_properties_typeProperties_folderPath')]"
+					},
+					"jsonblob_properties_typeProperties_fileName": {
+						"value": "[parameters('jsonblob_properties_typeProperties_fileName')]"
+					},
+					"jsonblob_properties_typeProperties_folderPath": {
+						"value": "[parameters('jsonblob_properties_typeProperties_folderPath')]"
 					},
 					"locationMap_properties_typeProperties_fileName": {
 						"value": "[parameters('locationMap_properties_typeProperties_fileName')]"

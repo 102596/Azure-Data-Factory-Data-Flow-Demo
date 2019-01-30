@@ -83,6 +83,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accessToken' of 'MyDataBricksLinkedService'"
 		},
+		"TaxiDataSQLDB_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'TaxiDataSQLDB'"
+		},
 		"adb5_jan_eastus_accessToken": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accessToken' of 'adb5_jan_eastus'"
@@ -94,10 +98,6 @@
 		"databricksJobCluster_accessToken": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accessToken' of 'databricksJobCluster'"
-		},
-		"TaxiDataSQLDB_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'TaxiDataSQLDB'"
 		},
 		"A_G_properties_typeProperties_fileName": {
 			"type": "string",
@@ -5043,6 +5043,83 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/TaxiDataSQLDB')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "TaxiDataSQLDB",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"structure": [
+					{
+						"name": "medallion",
+						"type": "String"
+					},
+					{
+						"name": "hack_license",
+						"type": "String"
+					},
+					{
+						"name": "vendor_id",
+						"type": "String"
+					},
+					{
+						"name": "rate_code",
+						"type": "String"
+					},
+					{
+						"name": "store_and_fwd_flag",
+						"type": "String"
+					},
+					{
+						"name": "pickup_datetime",
+						"type": "String"
+					},
+					{
+						"name": "dropoff_datetime",
+						"type": "String"
+					},
+					{
+						"name": "passenger_count",
+						"type": "Int32"
+					},
+					{
+						"name": "trip_time_in_secs",
+						"type": "Int64"
+					},
+					{
+						"name": "trip_distance",
+						"type": "Double"
+					},
+					{
+						"name": "pickup_longitude",
+						"type": "Double"
+					},
+					{
+						"name": "pickup_latitude",
+						"type": "Double"
+					},
+					{
+						"name": "dropoff_longitude",
+						"type": "Double"
+					},
+					{
+						"name": "dropoff_latitude",
+						"type": "Double"
+					}
+				],
+				"typeProperties": {
+					"tableName": "[concat('[', 'dbo].[TripData]')]"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/TaxiDataSQLDB')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/TaxiDemoDayStatsSink')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-07-01-preview",
@@ -5136,6 +5213,71 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/MyAzureBlobLinkedService')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/TripFareLarge')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "TaxiDataSQLDB",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"structure": [
+					{
+						"name": "medallion",
+						"type": "String"
+					},
+					{
+						"name": "hack_license",
+						"type": "String"
+					},
+					{
+						"name": "vendor_id",
+						"type": "String"
+					},
+					{
+						"name": "pickup_datetime",
+						"type": "String"
+					},
+					{
+						"name": "payment_type",
+						"type": "String"
+					},
+					{
+						"name": "fare_amount",
+						"type": "Double"
+					},
+					{
+						"name": "surcharge",
+						"type": "Double"
+					},
+					{
+						"name": "mta_tax",
+						"type": "Double"
+					},
+					{
+						"name": "tip_amount",
+						"type": "Double"
+					},
+					{
+						"name": "tolls_amount",
+						"type": "Double"
+					},
+					{
+						"name": "total_amount",
+						"type": "Double"
+					}
+				],
+				"typeProperties": {
+					"tableName": "[concat('[', 'dbo].[TripFare]')]"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/TaxiDataSQLDB')]"
 			]
 		},
 		{
@@ -6131,6 +6273,19 @@
 						"value": "[parameters('MyDataBricksLinkedService_accessToken')]"
 					},
 					"existingClusterId": "0913-182215-honey865"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/TaxiDataSQLDB')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('TaxiDataSQLDB_connectionString')]"
 				}
 			},
 			"dependsOn": []
@@ -7484,30 +7639,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/pivotflow1')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-07-01-preview",
-			"properties": {
-				"sources": [
-					{
-						"dataset": {
-							"referenceName": "Product_Blob",
-							"type": "DatasetReference"
-						},
-						"name": "ProductSource",
-						"script": "source(output(\n\t\tProductID as string,\n\t\tName as string,\n\t\tProductNumber as string,\n\t\tColor as string,\n\t\tStandardCost as decimal(10,0),\n\t\tListPrice as string,\n\t\tSize as string,\n\t\tWeight as string,\n\t\tProductCategoryID as string,\n\t\tProductModelID as string,\n\t\tSellStartDate as string,\n\t\tSellEndDate as string,\n\t\tDiscontinuedDate as string,\n\t\tThumbNailPhoto as string,\n\t\tThumbnailPhotoFileName as string,\n\t\trowguid as string,\n\t\tModifiedDate as string\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> ProductSource",
-						"typeProperties": {}
-					}
-				],
-				"sinks": [],
-				"transformations": [],
-				"parameters": {}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/Product_Blob')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/pivotflow2')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-07-01-preview",
@@ -7645,7 +7776,7 @@
 				"sinks": [
 					{
 						"dataset": {
-							"referenceName": "driftout",
+							"referenceName": "AzureBlobBaseballOutput",
 							"type": "DatasetReference"
 						},
 						"name": "sinkToDW",
@@ -7663,7 +7794,7 @@
 					},
 					{
 						"name": "TimeBins",
-						"script": "ColumnSelectionNaming window(over(time),\n\tasc(event_type2, true),\n\tTimeBins = rowNumber()) ~> TimeBins"
+						"script": "ColumnSelectionNaming window(over(time),\n\tasc(event_type2, true),\n\tTimeBins = nTile(10)) ~> TimeBins"
 					},
 					{
 						"name": "ColumnSelectionNaming",
@@ -7675,162 +7806,7 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/soccer_events')]",
 				"[concat(variables('factoryId'), '/datasets/locationMap')]",
-				"[concat(variables('factoryId'), '/datasets/driftout')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/TaxiDataSQLDB')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-07-01-preview",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "TaxiDataSQLDB",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"structure": [
-					{
-						"name": "medallion",
-						"type": "String"
-					},
-					{
-						"name": "hack_license",
-						"type": "String"
-					},
-					{
-						"name": "vendor_id",
-						"type": "String"
-					},
-					{
-						"name": "rate_code",
-						"type": "String"
-					},
-					{
-						"name": "store_and_fwd_flag",
-						"type": "String"
-					},
-					{
-						"name": "pickup_datetime",
-						"type": "String"
-					},
-					{
-						"name": "dropoff_datetime",
-						"type": "String"
-					},
-					{
-						"name": "passenger_count",
-						"type": "Int32"
-					},
-					{
-						"name": "trip_time_in_secs",
-						"type": "Int64"
-					},
-					{
-						"name": "trip_distance",
-						"type": "Double"
-					},
-					{
-						"name": "pickup_longitude",
-						"type": "Double"
-					},
-					{
-						"name": "pickup_latitude",
-						"type": "Double"
-					},
-					{
-						"name": "dropoff_longitude",
-						"type": "Double"
-					},
-					{
-						"name": "dropoff_latitude",
-						"type": "Double"
-					}
-				],
-				"typeProperties": {
-					"tableName": "[concat('[', 'dbo].[TripData]')]"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/TaxiDataSQLDB')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/TaxiDataSQLDB')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-07-01-preview",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"connectionString": "[parameters('TaxiDataSQLDB_connectionString')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/TripFareLarge')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-07-01-preview",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "TaxiDataSQLDB",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"structure": [
-					{
-						"name": "medallion",
-						"type": "String"
-					},
-					{
-						"name": "hack_license",
-						"type": "String"
-					},
-					{
-						"name": "vendor_id",
-						"type": "String"
-					},
-					{
-						"name": "pickup_datetime",
-						"type": "String"
-					},
-					{
-						"name": "payment_type",
-						"type": "String"
-					},
-					{
-						"name": "fare_amount",
-						"type": "Double"
-					},
-					{
-						"name": "surcharge",
-						"type": "Double"
-					},
-					{
-						"name": "mta_tax",
-						"type": "Double"
-					},
-					{
-						"name": "tip_amount",
-						"type": "Double"
-					},
-					{
-						"name": "tolls_amount",
-						"type": "Double"
-					},
-					{
-						"name": "total_amount",
-						"type": "Double"
-					}
-				],
-				"typeProperties": {
-					"tableName": "[concat('[', 'dbo].[TripFare]')]"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/TaxiDataSQLDB')]"
+				"[concat(variables('factoryId'), '/datasets/AzureBlobBaseballOutput')]"
 			]
 		}
 	]

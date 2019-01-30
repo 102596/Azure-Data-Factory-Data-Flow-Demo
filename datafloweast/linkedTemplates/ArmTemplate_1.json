@@ -7,6 +7,11 @@
 			"metadata": "Data Factory Name",
 			"defaultValue": "datafloweast"
 		},
+		"integrationRuntime_integrationRuntime1": {
+			"type": "string",
+			"metadata": "Integration Runtime Name",
+			"defaultValue": "integrationRuntime1"
+		},
 		"integrationRuntime_integrationRuntime2": {
 			"type": "string",
 			"metadata": "Integration Runtime Name",
@@ -21,10 +26,6 @@
 			"type": "string",
 			"metadata": "Integration Runtime Name",
 			"defaultValue": "selfhostedir"
-		},
-		"TaxiDataSQLDB_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'TaxiDataSQLDB'"
 		},
 		"integrationRuntime2_properties_typeProperties_ssisProperties_catalogInfo_catalogServerEndpoint": {
 			"type": "string",
@@ -83,6 +84,16 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/', parameters('integrationRuntime_integrationRuntime1'))]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"type": "SelfHosted",
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/', parameters('integrationRuntime_integrationRuntime2'))]",
 			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
 			"apiVersion": "2018-07-01-preview",
@@ -133,19 +144,6 @@
 			"properties": {
 				"type": "SelfHosted",
 				"typeProperties": {}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/TaxiDataSQLDB')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-07-01-preview",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"connectionString": "[parameters('TaxiDataSQLDB_connectionString')]"
-				}
 			},
 			"dependsOn": []
 		},

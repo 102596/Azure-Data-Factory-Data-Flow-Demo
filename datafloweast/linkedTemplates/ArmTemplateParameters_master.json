@@ -59,6 +59,9 @@
 		"MyDataBricksLinkedService_accessToken": {
 			"value": ""
 		},
+		"TaxiDataSQLDB_connectionString": {
+			"value": ""
+		},
 		"adb5_jan_eastus_accessToken": {
 			"value": ""
 		},
@@ -66,9 +69,6 @@
 			"value": ""
 		},
 		"databricksJobCluster_accessToken": {
-			"value": ""
-		},
-		"TaxiDataSQLDB_connectionString": {
 			"value": ""
 		},
 		"A_G_properties_typeProperties_fileName": {
