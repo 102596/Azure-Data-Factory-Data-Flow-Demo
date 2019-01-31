@@ -914,7 +914,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/pivotflow2')]",
+			"name": "[concat(parameters('factoryName'), '/PivotProductCostsbyColor')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-07-01-preview",
 			"properties": {
@@ -929,19 +929,24 @@
 						"typeProperties": {}
 					}
 				],
-				"sinks": [],
+				"sinks": [
+					{
+						"dataset": {
+							"referenceName": "AzureBlobBaseballOutput",
+							"type": "DatasetReference"
+						},
+						"name": "SerializePivotedCalcs",
+						"script": "PivotRedBlackCosts sink(saveMode:'overwrite') ~> SerializePivotedCalcs"
+					}
+				],
 				"transformations": [
 					{
-						"name": "PivotColorStandardCost",
-						"script": "ProductSource pivot(groupBy(Name,\n\t\tProductID),\n\tpivotBy(Color),\n\tCostSum = sum(StandardCost),\n\tcolumnNaming: '$N$V',\n\tlateral: true) ~> PivotColorStandardCost"
+						"name": "PivotRedBlackCosts",
+						"script": "ProductSource pivot(groupBy(Size= iif(isNull(Size) || Size == 'NULL','NA',Size)),\n\tpivotBy(Color, ['Red']),\n\tCostSum = sum(StandardCost),\n\tcolumnNaming: '$N$V',\n\tlateral: true) ~> PivotRedBlackCosts"
 					},
 					{
-						"name": "ProductSourceBranch",
-						"script": "ProductSource select(mapColumn(\n\t\tProductID2 = ProductID,\n\t\tName,\n\t\tProductNumber,\n\t\tColor,\n\t\tStandardCost,\n\t\tListPrice,\n\t\tSize,\n\t\tWeight,\n\t\tProductCategoryID,\n\t\tProductModelID\n\t))~> ProductSourceBranch"
-					},
-					{
-						"name": "Join1",
-						"script": "PivotColorStandardCost, ProductSourceBranch join(ProductID == ProductID2,\n\tjoinType:'inner',\n\tbroadcast: 'none')~> Join1"
+						"name": "Unpivot1",
+						"script": "PivotRedBlackCosts unpivot(output(\n\t\tColor as string,\n\t\tCostSumRed as decimal(NaN,0)\n\t),\n\tungroupBy(Size),\n\tlateral: true,\n\tignoreNullPivots: false) ~> Unpivot1"
 					}
 				],
 				"parameters": {}
