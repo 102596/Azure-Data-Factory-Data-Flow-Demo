@@ -13,6 +13,108 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/flightDF')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"sources": [
+					{
+						"dataset": {
+							"referenceName": "AzureSqlTable3",
+							"type": "DatasetReference"
+						},
+						"name": "sourceFlights",
+						"script": "source(output(\n\t\tYEAR as short,\n\t\tMONTH as short,\n\t\tFL_DATE as timestamp,\n\t\tUNIQUE_CARRIER as string,\n\t\tAIRLINE_ID as integer,\n\t\tCARRIER as string,\n\t\tTAIL_NUM as string,\n\t\tFL_NUM as integer,\n\t\tORIGIN_AIRPORT_ID as integer,\n\t\tORIGIN_AIRPORT_SEQ_ID as integer,\n\t\tORIGIN_CITY_MARKET_ID as integer,\n\t\tDEST_AIRPORT_ID as integer,\n\t\tDEST_AIRPORT_SEQ_ID as integer,\n\t\tDEST_CITY_MARKET_ID as integer,\n\t\tDEP_TIME as string,\n\t\tDEP_DELAY as double,\n\t\tDEP_DELAY_NEW as double,\n\t\tTAXI_OUT as double,\n\t\tWHEELS_OFF as string,\n\t\tWHEELS_ON as string,\n\t\tTAXI_IN as double,\n\t\tARR_TIME as string,\n\t\tARR_DELAY as double,\n\t\tARR_DELAY_NEW as double,\n\t\tCANCELLED as boolean,\n\t\tCANCELLATION_CODE as string,\n\t\tACTUAL_ELAPSED_TIME as double,\n\t\tAIR_TIME as double,\n\t\tFLIGHTS as integer,\n\t\tDISTANCE as integer,\n\t\tCARRIER_DELAY as double,\n\t\tWEATHER_DELAY as double,\n\t\tNAS_DELAY as double,\n\t\tSECURITY_DELAY as double,\n\t\tLATE_AIRCRAFT_DELAY as double,\n\t\tDEST_CODE as string,\n\t\tORIGIN_CODE as string\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> sourceFlights",
+						"typeProperties": {}
+					},
+					{
+						"dataset": {
+							"referenceName": "airlines",
+							"type": "DatasetReference"
+						},
+						"name": "sourceAirlines",
+						"script": "source(output(\n\t\tCode as integer,\n\t\tAirline_Code as integer\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> sourceAirlines",
+						"typeProperties": {}
+					},
+					{
+						"dataset": {
+							"referenceName": "airports",
+							"type": "DatasetReference"
+						},
+						"name": "sourceAirports",
+						"script": "source(output(\n\t\tCode as string,\n\t\tCity_Airport as string\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> sourceAirports",
+						"typeProperties": {}
+					}
+				],
+				"sinks": [
+					{
+						"dataset": {
+							"referenceName": "delays",
+							"type": "DatasetReference"
+						},
+						"name": "sink1",
+						"script": "Aggregate1 sink(mapColumn(\n\t\tcarrier = CARRIER,\n\t\tyear = YEAR,\n\t\tdelays = totalDelays\n\t),\n\tpartitionBy('hash', 1),\n\tsaveMode:'overwrite') ~> sink1"
+					}
+				],
+				"transformations": [
+					{
+						"name": "Lookup1",
+						"script": "sourceFlights, sourceAirlines lookup(AIRLINE_ID == toInteger(Code),\n\tbroadcast: 'none')~> Lookup1"
+					},
+					{
+						"name": "Lookup2",
+						"script": "Lookup1, sourceAirports lookup(ORIGIN_AIRPORT_ID == toInteger(sourceAirports@Code),\n\tbroadcast: 'none')~> Lookup2"
+					},
+					{
+						"name": "Aggregate1",
+						"script": "Lookup2 aggregate(groupBy(CARRIER,\n\t\tYEAR),\n\ttotalDelays = sum(CARRIER_DELAY),\n\tpartitionBy('hash', 1)) ~> Aggregate1"
+					}
+				],
+				"parameters": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PivotProductCostsbyColor')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"sources": [
+					{
+						"dataset": {
+							"referenceName": "Product_Blob",
+							"type": "DatasetReference"
+						},
+						"name": "ProductSource",
+						"script": "source(output(\n\t\tProductID as string,\n\t\tName as string,\n\t\tProductNumber as string,\n\t\tColor as string,\n\t\tStandardCost as decimal(10,0),\n\t\tListPrice as string,\n\t\tSize as string,\n\t\tWeight as string,\n\t\tProductCategoryID as string,\n\t\tProductModelID as string\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> ProductSource",
+						"typeProperties": {}
+					}
+				],
+				"sinks": [
+					{
+						"dataset": {
+							"referenceName": "AzureBlobBaseballOutput",
+							"type": "DatasetReference"
+						},
+						"name": "SerializePivotedCalcs",
+						"script": "PivotRedBlackCosts sink(saveMode:'overwrite') ~> SerializePivotedCalcs"
+					}
+				],
+				"transformations": [
+					{
+						"name": "PivotRedBlackCosts",
+						"script": "ProductSource pivot(groupBy(Size= iif(isNull(Size) || Size == 'NULL','NA',Size)),\n\tpivotBy(Color, ['Red']),\n\tCostSum = sum(StandardCost),\n\tcolumnNaming: '$N$V',\n\tlateral: true) ~> PivotRedBlackCosts"
+					},
+					{
+						"name": "Unpivot1",
+						"script": "PivotRedBlackCosts unpivot(output(\n\t\tColor as string,\n\t\tCostSumRed as decimal(NaN,0)\n\t),\n\tungroupBy(Size),\n\tlateral: true,\n\tignoreNullPivots: false) ~> Unpivot1"
+					}
+				],
+				"parameters": {}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/regexflow')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-07-01-preview",
@@ -90,8 +192,8 @@
 							"referenceName": "soccer_events",
 							"type": "DatasetReference"
 						},
-						"name": "SpecifySchemaExtract",
-						"script": "source(output(\n\t\tid_odsp as string,\n\t\tid_event as string,\n\t\tsort_order as integer,\n\t\ttime as integer,\n\t\ttext as string,\n\t\tevent_type as string,\n\t\tevent_type2 as string,\n\t\tside as string,\n\t\tevent_team as string,\n\t\topponent as string,\n\t\tplayer as string,\n\t\tplayer2 as string,\n\t\tplayer_in as string,\n\t\tplayer_out as string,\n\t\tshot_place as string,\n\t\tshot_outcome as string,\n\t\tis_goal as string,\n\t\tlocation as string,\n\t\tbodypart as string,\n\t\tassist_method as string,\n\t\tsituation as string,\n\t\tfast_break as string\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> SpecifySchemaExtract",
+						"name": "SpecifySchemaExtracts",
+						"script": "source(output(\n\t\tid_odsp as string,\n\t\tid_event as string,\n\t\tsort_order as integer,\n\t\ttime as integer,\n\t\ttext as string,\n\t\tevent_type as string,\n\t\tevent_type2 as string,\n\t\tside as string,\n\t\tevent_team as string,\n\t\topponent as string,\n\t\tplayer as string,\n\t\tplayer2 as string,\n\t\tplayer_in as string,\n\t\tplayer_out as string,\n\t\tshot_place as string,\n\t\tshot_outcome as string,\n\t\tis_goal as string,\n\t\tlocation as string,\n\t\tbodypart as string,\n\t\tassist_method as string,\n\t\tsituation as string,\n\t\tfast_break as string\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> SpecifySchemaExtracts",
 						"typeProperties": {}
 					},
 					{
@@ -100,7 +202,7 @@
 							"type": "DatasetReference"
 						},
 						"name": "locationMap",
-						"script": "source(output(\n\t\tType as string,\n\t\tName as string\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> locationMap",
+						"script": "source(output(\n\t\tType as string,\n\t\tName as any\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> locationMap",
 						"typeProperties": {}
 					}
 				],
@@ -117,7 +219,7 @@
 				"transformations": [
 					{
 						"name": "DictionaryMapping1",
-						"script": "SpecifySchemaExtract derive(eventTypeMap = case(\r\n    event_type == '0','Announcement',\r\n    event_type == '1','Attempt',\r\n    event_type == '2','Corner',\r\n    event_type == '3','Foul',\r\n    event_type == '4','Yellow Card',\r\n    event_type == '5','Second yellow card',\r\n    event_type == '6','Red card',\r\n    event_type == '7','Substitution',\r\n    event_type == '8','Free kick won',\r\n    event_type == '9','Offside',\r\n    event_type == '10','Hand ball',\r\n    event_type == '11','Penalty conceded',\r\n    event_type == '99', 'NA'\r\n),\n\t\ttime = toInteger(time)) ~> DictionaryMapping1"
+						"script": "SpecifySchemaExtracts derive(eventTypeMap = case(\r\n    event_type == '0','Announcement',\r\n    event_type == '1','Attempt',\r\n    event_type == '2','Corner',\r\n    event_type == '3','Foul',\r\n    event_type == '4','Yellow Card',\r\n    event_type == '5','Second yellow card',\r\n    event_type == '6','Red card',\r\n    event_type == '7','Substitution',\r\n    event_type == '8','Free kick won',\r\n    event_type == '9','Offside',\r\n    event_type == '10','Hand ball',\r\n    event_type == '11','Penalty conceded',\r\n    event_type == '99', 'NA'\r\n),\n\t\ttime = toInteger(time)) ~> DictionaryMapping1"
 					},
 					{
 						"name": "JoinStringDataViaLookup",
@@ -132,6 +234,37 @@
 						"script": "JoinStringDataViaLookup select(mapColumn(\n\t\tid_odsp,\n\t\tid_event,\n\t\tsort_order,\n\t\ttime,\n\t\ttext,\n\t\tevent_type2,\n\t\tside,\n\t\tevent_team,\n\t\topponent,\n\t\tplayer,\n\t\tplayer2,\n\t\tplayer_in,\n\t\tplayer_out,\n\t\tshot_place,\n\t\tshot_outcome,\n\t\tis_goal,\n\t\tlocation,\n\t\tbodypart,\n\t\tassist_method,\n\t\tsituation,\n\t\tfast_break,\n\t\teventTypeName = eventTypeMap,\n\t\tLocationName = Name\n\t))~> ColumnSelectionNaming"
 					}
 				],
+				"parameters": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dataflow2')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"sources": [
+					{
+						"dataset": {
+							"referenceName": "DriverShiftTrips",
+							"type": "DatasetReference"
+						},
+						"name": "DriverShiftTrips",
+						"script": "source(output(\n\t\tProp_0 as string,\n\t\tdriverid as string,\n\t\tProp_2 as string,\n\t\tProp_3 as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> DriverShiftTrips",
+						"typeProperties": {}
+					},
+					{
+						"dataset": {
+							"referenceName": "Drivers",
+							"type": "DatasetReference"
+						},
+						"name": "source",
+						"script": "source(output(\n\t\tProp_0 as string,\n\t\tProp_1 as string,\n\t\tProp_2 as string,\n\t\tProp_3 as string,\n\t\tProp_4 as string,\n\t\tProp_5 as string,\n\t\tProp_6 as string,\n\t\tProp_7 as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> source",
+						"typeProperties": {}
+					}
+				],
+				"sinks": [],
+				"transformations": [],
 				"parameters": {}
 			},
 			"dependsOn": []

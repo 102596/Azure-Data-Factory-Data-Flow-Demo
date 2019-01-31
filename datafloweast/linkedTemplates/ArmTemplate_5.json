@@ -13,6 +13,188 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/Baseball 1 Norm Batting Stats')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Baseball"
+				},
+				"sources": [
+					{
+						"dataset": {
+							"referenceName": "BaseballBatting",
+							"type": "DatasetReference"
+						},
+						"name": "sourceBatting",
+						"script": "source(output(\n\t\tplayerID as string,\n\t\tyearID as string,\n\t\tstint as string,\n\t\tteamID as string,\n\t\tlgID as string,\n\t\tG as integer,\n\t\tAB as integer,\n\t\tR as integer,\n\t\tH as integer,\n\t\tH2B as integer,\n\t\tH3B as integer,\n\t\tHR as integer,\n\t\tRBI as integer,\n\t\tSB as integer,\n\t\tCS as integer,\n\t\tBB as integer,\n\t\tSO as integer,\n\t\tIBB as integer,\n\t\tHBP as integer,\n\t\tSH as integer,\n\t\tSF as integer,\n\t\tGIDP as integer\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> sourceBatting",
+						"typeProperties": {}
+					},
+					{
+						"dataset": {
+							"referenceName": "PlayersBlob",
+							"type": "DatasetReference"
+						},
+						"name": "sourcePlayer",
+						"script": "source(output(\n\t\tplayerID as string,\n\t\tbirthYear as string,\n\t\tbirthMonth as string,\n\t\tbirthDay as string,\n\t\tbirthCountry as string,\n\t\tbirthState as string,\n\t\tbirthCity as string,\n\t\tdeathYear as string,\n\t\tdeathMonth as string,\n\t\tdeathDay as string,\n\t\tdeathCountry as string,\n\t\tdeathState as string,\n\t\tdeathCity as string,\n\t\tnameFirst as string,\n\t\tnameLast as string,\n\t\tnameGiven as string,\n\t\tweight as string,\n\t\theight as string,\n\t\tbats as string,\n\t\tthrows as string,\n\t\tdebut as string,\n\t\tfinalGame as string,\n\t\tretroID as string,\n\t\tbbrefID as string\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> sourcePlayer",
+						"typeProperties": {}
+					}
+				],
+				"sinks": [
+					{
+						"dataset": {
+							"referenceName": "AzureBlobBaseballOutput",
+							"type": "DatasetReference"
+						},
+						"name": "sink1",
+						"script": "Join1 sink(mapColumn(\n\t\tBA,\n\t\tOBP,\n\t\tSLG,\n\t\tbirthYear,\n\t\tbirthMonth,\n\t\tbirthDay,\n\t\tbirthCountry,\n\t\tbirthState,\n\t\tbirthCity,\n\t\tdeathYear,\n\t\tdeathMonth,\n\t\tdeathDay,\n\t\tdeathCountry,\n\t\tdeathState,\n\t\tdeathCity,\n\t\tnameFirst,\n\t\tnameLast,\n\t\tnameGiven,\n\t\tweight,\n\t\theight,\n\t\tbats,\n\t\tthrows,\n\t\tdebut,\n\t\tfinalGame,\n\t\tretroID,\n\t\tbbrefID,\n\t\tplayerID = OrigSourceBatting@playerID,\n\t\tyearID = OrigSourceBatting@yearID,\n\t\tstint,\n\t\tteamID,\n\t\tlgID,\n\t\tG,\n\t\tAB,\n\t\tR,\n\t\tH,\n\t\tH2B,\n\t\tH3B,\n\t\tHR,\n\t\tRBI,\n\t\tSB,\n\t\tCS,\n\t\tBB,\n\t\tSO,\n\t\tIBB,\n\t\tHBP,\n\t\tSH,\n\t\tSF,\n\t\tGIDP,\n\t\tTB\n\t),\n\tsaveMode:'overwrite') ~> sink1",
+						"maxConcurrentConnections": 10
+					}
+				],
+				"transformations": [
+					{
+						"name": "createAggs",
+						"script": "CalcTotalBases aggregate(groupBy(playerID,\n\t\tyearID),\n\tBA = round(avg(H/AB),3),\n\t\tOBP = round(avg((H+BB+HBP)/(AB+BB+HBP+SF)),3),\n\t\tSLG = round(avg(TB/AB),3)) ~> createAggs"
+					},
+					{
+						"name": "Join1",
+						"script": "createAggs, PlayerInfoPlusOrigStats join(createAggs@playerID == sourcePlayer@playerID,\n\tjoinType:'inner',\n\tbroadcast: 'none')~> Join1"
+					},
+					{
+						"name": "PlayerInfoPlusOrigStats",
+						"script": "sourcePlayer, OrigSourceBatting join(sourcePlayer@playerID == OrigSourceBatting@playerID,\n\tjoinType:'inner',\n\tbroadcast: 'none')~> PlayerInfoPlusOrigStats"
+					},
+					{
+						"name": "CalcTotalBases",
+						"script": "sourceBatting derive(TB = (HR * 4) + (H3B * 3) + (H2B * 2) + (H-H2B-H3B-HR)) ~> CalcTotalBases"
+					},
+					{
+						"name": "OrigSourceBatting",
+						"script": "CalcTotalBases select()~> OrigSourceBatting"
+					}
+				],
+				"parameters": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Baseball 2 Adv Stats')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"description": "Let's now create the advanced Bill James Sabermetrics stats",
+				"folder": {
+					"name": "Baseball"
+				},
+				"sources": [
+					{
+						"dataset": {
+							"referenceName": "SQLDBBaseball2",
+							"type": "DatasetReference"
+						},
+						"name": "source1",
+						"script": "source(output(\n\t\tBA as double,\n\t\tOBP as double,\n\t\tSLG as double,\n\t\tTB as integer,\n\t\tbirthYear as string,\n\t\tbirthMonth as string,\n\t\tbirthDay as string,\n\t\tbirthCountry as string,\n\t\tbirthState as string,\n\t\tbirthCity as string,\n\t\tdeathYear as string,\n\t\tdeathMonth as string,\n\t\tdeathDay as string,\n\t\tdeathCountry as string,\n\t\tdeathState as string,\n\t\tdeathCity as string,\n\t\tnameFirst as string,\n\t\tnameLast as string,\n\t\tnameGiven as string,\n\t\tweight as string,\n\t\theight as string,\n\t\tbats as string,\n\t\tthrows as string,\n\t\tdebut as string,\n\t\tfinalGame as string,\n\t\tretroID as string,\n\t\tbbrefID as string,\n\t\tplayerID as string,\n\t\tyearID as string,\n\t\tstint as string,\n\t\tteamID as string,\n\t\tlgID as string,\n\t\tG as integer,\n\t\tAB as integer,\n\t\tR as integer,\n\t\tH as integer,\n\t\tH2B as integer,\n\t\tH3B as integer,\n\t\tHR as integer,\n\t\tRBI as integer,\n\t\tSB as integer,\n\t\tCS as integer,\n\t\tBB as integer,\n\t\tSO as integer,\n\t\tIBB as integer,\n\t\tHBP as integer,\n\t\tSH as integer,\n\t\tSF as integer,\n\t\tGIDP as integer\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> source1",
+						"typeProperties": {}
+					}
+				],
+				"sinks": [
+					{
+						"dataset": {
+							"referenceName": "DWSabermetrics",
+							"type": "DatasetReference"
+						},
+						"name": "sink1",
+						"script": "RunsCreated sink(mapColumn(\n\t\tBA,\n\t\tOBP,\n\t\tSLG,\n\t\tTB,\n\t\tbirthYear,\n\t\tbirthMonth,\n\t\tbirthDay,\n\t\tbirthCountry,\n\t\tbirthState,\n\t\tbirthCity,\n\t\tdeathYear,\n\t\tdeathMonth,\n\t\tdeathDay,\n\t\tdeathCountry,\n\t\tdeathState,\n\t\tdeathCity,\n\t\tnameFirst,\n\t\tnameLast,\n\t\tnameGiven,\n\t\tweight,\n\t\theight,\n\t\tbats,\n\t\tthrows,\n\t\tdebut,\n\t\tfinalGame,\n\t\tretroID,\n\t\tbbrefID,\n\t\tplayerID,\n\t\tyearID,\n\t\tstint,\n\t\tteamID,\n\t\tlgID,\n\t\tG,\n\t\tAB,\n\t\tR,\n\t\tH,\n\t\tH2B,\n\t\tH3B,\n\t\tHR,\n\t\tRBI,\n\t\tSB,\n\t\tCS,\n\t\tBB,\n\t\tSO,\n\t\tIBB,\n\t\tHBP,\n\t\tSH,\n\t\tSF,\n\t\tGIDP,\n\t\tRunsCreated\n\t),\n\tsaveMode:'overwrite') ~> sink1"
+					}
+				],
+				"transformations": [
+					{
+						"name": "RunsCreated",
+						"script": "source1 derive(RunsCreated = round(  ((H + BB) * TB) / (AB + BB), 3)) ~> RunsCreated"
+					}
+				],
+				"parameters": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/BugBash1')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Bug Bashes"
+				},
+				"sources": [
+					{
+						"dataset": {
+							"referenceName": "SQLDB_SalesHeader",
+							"type": "DatasetReference"
+						},
+						"name": "SourceSalesHeader",
+						"script": "source(output(\n\t\tSalesOrderID as integer,\n\t\tRevisionNumber as string,\n\t\tOrderDate as date,\n\t\tDueDate as date,\n\t\tShipDate as date,\n\t\tStatus as string,\n\t\tOnlineOrderFlag as boolean,\n\t\tSalesOrderNumber as string,\n\t\tPurchaseOrderNumber as string,\n\t\tAccountNumber as string,\n\t\tCustomerID as integer,\n\t\tShipToAddressID as integer,\n\t\tBillToAddressID as integer,\n\t\tShipMethod as string,\n\t\tCreditCardApprovalCode as string,\n\t\tSubTotal as decimal(10,0),\n\t\tTaxAmt as decimal(10,0),\n\t\tFreight as decimal(10,0),\n\t\tTotalDue as decimal(10,0),\n\t\tComment as string,\n\t\trowguid as string,\n\t\tModifiedDate as date\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> SourceSalesHeader",
+						"typeProperties": {}
+					},
+					{
+						"dataset": {
+							"referenceName": "SQLDB_SalesDetail",
+							"type": "DatasetReference"
+						},
+						"name": "SourceSalesDetail",
+						"script": "source(output(\n\t\tSalesOrderID as integer,\n\t\tSalesOrderDetailID as integer,\n\t\tOrderQty as short,\n\t\tProductID as integer,\n\t\tUnitPrice as decimal(10,0),\n\t\tUnitPriceDiscount as decimal(10,0),\n\t\tLineTotal as decimal(10,0),\n\t\trowguid as string,\n\t\tModifiedDate as date\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> SourceSalesDetail",
+						"typeProperties": {}
+					},
+					{
+						"dataset": {
+							"referenceName": "SQLDB_Products",
+							"type": "DatasetReference"
+						},
+						"name": "SourceProduct",
+						"script": "source(output(\n\t\tProductID as integer,\n\t\tName as string,\n\t\tProductNumber as string,\n\t\tColor as string,\n\t\tStandardCost as decimal(10,0),\n\t\tListPrice as decimal(10,0),\n\t\tSize as string,\n\t\tWeight as decimal(10,0),\n\t\tProductCategoryID as integer,\n\t\tProductModelID as integer,\n\t\tSellStartDate as date,\n\t\tSellEndDate as date,\n\t\tDiscontinuedDate as date,\n\t\tThumbNailPhoto as string,\n\t\tThumbnailPhotoFileName as string,\n\t\trowguid as string,\n\t\tModifiedDate as date\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> SourceProduct",
+						"typeProperties": {}
+					}
+				],
+				"sinks": [
+					{
+						"dataset": {
+							"referenceName": "ADW_FactSales",
+							"type": "DatasetReference"
+						},
+						"name": "SinkFactSales",
+						"script": "Join1 sink(mapColumn(\n\t\tOrderTotal,\n\t\tRevisionNumber,\n\t\tOrderDate,\n\t\tDueDate,\n\t\tShipDate,\n\t\tStatus,\n\t\tOnlineOrderFlag,\n\t\tSalesOrderNumber,\n\t\tPurchaseOrderNumber,\n\t\tAccountNumber,\n\t\tCustomerID,\n\t\tShipToAddressID,\n\t\tBillToAddressID,\n\t\tShipMethod,\n\t\tCreditCardApprovalCode,\n\t\tSubTotal,\n\t\tTaxAmt,\n\t\tFreight,\n\t\tTotalDue,\n\t\tComment,\n\t\trowguid,\n\t\tModifiedDate\n\t),\n\tsaveMode:'overwrite') ~> SinkFactSales"
+					},
+					{
+						"dataset": {
+							"referenceName": "ADW_DimProduct",
+							"type": "DatasetReference"
+						},
+						"name": "sinkDimProd",
+						"script": "Aggregate2 sink(mapColumn(\n\t\tName,\n\t\tProdCount\n\t),\n\tsaveMode:'overwrite') ~> sinkDimProd"
+					}
+				],
+				"transformations": [
+					{
+						"name": "Aggregate1",
+						"script": "SourceSalesDetail aggregate(groupBy(SalesOrderID),\n\tOrderTotal = sum(LineTotal)) ~> Aggregate1"
+					},
+					{
+						"name": "Join1",
+						"script": "Aggregate1, SourceSalesHeader join(Aggregate1@SalesOrderID == SourceSalesHeader@SalesOrderID,\n\tjoinType:'inner',\n\tbroadcast: 'none')~> Join1"
+					},
+					{
+						"name": "Join2",
+						"script": "SourceSalesDetail, SourceProduct join(SourceSalesDetail@ProductID == SourceProduct@ProductID,\n\tjoinType:'inner',\n\tbroadcast: 'none')~> Join2"
+					},
+					{
+						"name": "Aggregate2",
+						"script": "Join2 aggregate(groupBy(Name),\n\tProdCount = sum(1)) ~> Aggregate2"
+					}
+				],
+				"parameters": {}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/BugBash2')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-07-01-preview",
@@ -127,7 +309,7 @@
 					},
 					{
 						"dataset": {
-							"referenceName": "CurrencyDatasetCAD",
+							"referenceName": "CurrencyDatasetUSD",
 							"type": "DatasetReference"
 						},
 						"name": "CADSource",
@@ -142,7 +324,7 @@
 							"type": "DatasetReference"
 						},
 						"name": "USDSink",
-						"script": "ConditionalSplit1@USD sink(partitionBy('hash', 1),\n\tsaveMode:'overwrite') ~> USDSink"
+						"script": "ConditionalSplit1@USD sink(mapColumn(\n\t\tPreviousConversionRate = ConditionalSplit1@PreviousConversionRate,\n\t\tCountry = ConditionalSplit1@Country,\n\t\tDateTime1 = ConditionalSplit1@DateTime1,\n\t\tCurrentConversionRate = ConditionalSplit1@CurrentConversionRate,\n\t\tNewCurrencyRate\n\t),\n\tpartitionBy('hash', 1),\n\tsaveMode:'overwrite') ~> USDSink"
 					},
 					{
 						"dataset": {
@@ -150,24 +332,23 @@
 							"type": "DatasetReference"
 						},
 						"name": "CADSink",
-						"script": "ConditionalSplit1@CAD sink(partitionBy('hash', 1),\n\tsaveMode:'overwrite') ~> CADSink"
+						"script": "ConditionalSplit1@CAD sink(mapColumn(\n\t\tPreviousConversionRate = ConditionalSplit1@PreviousConversionRate,\n\t\tCountry = ConditionalSplit1@Country,\n\t\tDateTime1 = ConditionalSplit1@DateTime1,\n\t\tCurrentConversionRate = ConditionalSplit1@CurrentConversionRate,\n\t\tNewCurrencyRate\n\t),\n\tpartitionBy('hash', 1),\n\tsaveMode:'overwrite') ~> CADSink"
 					}
 				],
 				"transformations": [
 					{
-						"name": "Union",
-						"description": "The Union combines 2 streams together",
-						"script": "USDCurrency, CADSource union(byName: true)~> Union"
-					},
-					{
 						"name": "NewCurrencyColumn",
 						"description": "Create a new calculated column from currency rate",
-						"script": "Union derive(NewCurrencyRate = round(CurrentConversionRate*1.25)) ~> NewCurrencyColumn"
+						"script": "Join1 derive(NewCurrencyRate = round(USDCurrency@CurrentConversionRate*1.25)) ~> NewCurrencyColumn"
 					},
 					{
 						"name": "ConditionalSplit1",
 						"description": "Split the data on state to create 2 streams",
-						"script": "NewCurrencyColumn split(Country == 'USD',\n\tCountry == 'CAD',\n\tdisjoint: false) ~> ConditionalSplit1@(USD, CAD)"
+						"script": "NewCurrencyColumn split(USDCurrency@Country == 'USD',\n\tUSDCurrency@Country == 'CAD',\n\tdisjoint: false) ~> ConditionalSplit1@(USD, CAD)"
+					},
+					{
+						"name": "Join1",
+						"script": "USDCurrency, CADSource join(USDCurrency@PreviousConversionRate == CADSource@PreviousConversionRate,\n\tjoinType:'left',\n\tbroadcast: 'none')~> Join1"
 					}
 				],
 				"parameters": {}
@@ -756,28 +937,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/dataflow1')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-07-01-preview",
-			"properties": {
-				"sources": [
-					{
-						"dataset": {
-							"referenceName": "jsonblob",
-							"type": "DatasetReference"
-						},
-						"name": "source1",
-						"script": "source(output(\n\t\tid as string,\n\t\tcity as string,\n\t\tloc as string,\n\t\tpop as long,\n\t\tstate as string\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> source1",
-						"typeProperties": {}
-					}
-				],
-				"sinks": [],
-				"transformations": [],
-				"parameters": {}
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/dataflow_params1')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-07-01-preview",
@@ -845,108 +1004,6 @@
 					{
 						"name": "Aggregate1",
 						"script": "source1 aggregate(groupBy(playerID_year= playerID+yearID),\n\tdummy = sum(1)) ~> Aggregate1"
-					}
-				],
-				"parameters": {}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/flightDF')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-07-01-preview",
-			"properties": {
-				"sources": [
-					{
-						"dataset": {
-							"referenceName": "AzureSqlTable3",
-							"type": "DatasetReference"
-						},
-						"name": "sourceFlights",
-						"script": "source(output(\n\t\tYEAR as short,\n\t\tMONTH as short,\n\t\tFL_DATE as timestamp,\n\t\tUNIQUE_CARRIER as string,\n\t\tAIRLINE_ID as integer,\n\t\tCARRIER as string,\n\t\tTAIL_NUM as string,\n\t\tFL_NUM as integer,\n\t\tORIGIN_AIRPORT_ID as integer,\n\t\tORIGIN_AIRPORT_SEQ_ID as integer,\n\t\tORIGIN_CITY_MARKET_ID as integer,\n\t\tDEST_AIRPORT_ID as integer,\n\t\tDEST_AIRPORT_SEQ_ID as integer,\n\t\tDEST_CITY_MARKET_ID as integer,\n\t\tDEP_TIME as string,\n\t\tDEP_DELAY as double,\n\t\tDEP_DELAY_NEW as double,\n\t\tTAXI_OUT as double,\n\t\tWHEELS_OFF as string,\n\t\tWHEELS_ON as string,\n\t\tTAXI_IN as double,\n\t\tARR_TIME as string,\n\t\tARR_DELAY as double,\n\t\tARR_DELAY_NEW as double,\n\t\tCANCELLED as boolean,\n\t\tCANCELLATION_CODE as string,\n\t\tACTUAL_ELAPSED_TIME as double,\n\t\tAIR_TIME as double,\n\t\tFLIGHTS as integer,\n\t\tDISTANCE as integer,\n\t\tCARRIER_DELAY as double,\n\t\tWEATHER_DELAY as double,\n\t\tNAS_DELAY as double,\n\t\tSECURITY_DELAY as double,\n\t\tLATE_AIRCRAFT_DELAY as double,\n\t\tDEST_CODE as string,\n\t\tORIGIN_CODE as string\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> sourceFlights",
-						"typeProperties": {}
-					},
-					{
-						"dataset": {
-							"referenceName": "airlines",
-							"type": "DatasetReference"
-						},
-						"name": "sourceAirlines",
-						"script": "source(output(\n\t\tCode as integer,\n\t\tAirline_Code as integer\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> sourceAirlines",
-						"typeProperties": {}
-					},
-					{
-						"dataset": {
-							"referenceName": "airports",
-							"type": "DatasetReference"
-						},
-						"name": "sourceAirports",
-						"script": "source(output(\n\t\tCode as string,\n\t\tCity_Airport as string\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> sourceAirports",
-						"typeProperties": {}
-					}
-				],
-				"sinks": [
-					{
-						"dataset": {
-							"referenceName": "delays",
-							"type": "DatasetReference"
-						},
-						"name": "sink1",
-						"script": "Aggregate1 sink(mapColumn(\n\t\tcarrier = CARRIER,\n\t\tyear = YEAR,\n\t\tdelays = totalDelays\n\t),\n\tpartitionBy('hash', 1),\n\tsaveMode:'overwrite') ~> sink1"
-					}
-				],
-				"transformations": [
-					{
-						"name": "Lookup1",
-						"script": "sourceFlights, sourceAirlines lookup(AIRLINE_ID == toInteger(Code),\n\tbroadcast: 'none')~> Lookup1"
-					},
-					{
-						"name": "Lookup2",
-						"script": "Lookup1, sourceAirports lookup(ORIGIN_AIRPORT_ID == toInteger(sourceAirports@Code),\n\tbroadcast: 'none')~> Lookup2"
-					},
-					{
-						"name": "Aggregate1",
-						"script": "Lookup2 aggregate(groupBy(CARRIER,\n\t\tYEAR),\n\ttotalDelays = sum(CARRIER_DELAY),\n\tpartitionBy('hash', 1)) ~> Aggregate1"
-					}
-				],
-				"parameters": {}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/PivotProductCostsbyColor')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-07-01-preview",
-			"properties": {
-				"sources": [
-					{
-						"dataset": {
-							"referenceName": "Product_Blob",
-							"type": "DatasetReference"
-						},
-						"name": "ProductSource",
-						"script": "source(output(\n\t\tProductID as string,\n\t\tName as string,\n\t\tProductNumber as string,\n\t\tColor as string,\n\t\tStandardCost as decimal(10,0),\n\t\tListPrice as string,\n\t\tSize as string,\n\t\tWeight as string,\n\t\tProductCategoryID as string,\n\t\tProductModelID as string\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> ProductSource",
-						"typeProperties": {}
-					}
-				],
-				"sinks": [
-					{
-						"dataset": {
-							"referenceName": "AzureBlobBaseballOutput",
-							"type": "DatasetReference"
-						},
-						"name": "SerializePivotedCalcs",
-						"script": "PivotRedBlackCosts sink(saveMode:'overwrite') ~> SerializePivotedCalcs"
-					}
-				],
-				"transformations": [
-					{
-						"name": "PivotRedBlackCosts",
-						"script": "ProductSource pivot(groupBy(Size= iif(isNull(Size) || Size == 'NULL','NA',Size)),\n\tpivotBy(Color, ['Red']),\n\tCostSum = sum(StandardCost),\n\tcolumnNaming: '$N$V',\n\tlateral: true) ~> PivotRedBlackCosts"
-					},
-					{
-						"name": "Unpivot1",
-						"script": "PivotRedBlackCosts unpivot(output(\n\t\tColor as string,\n\t\tCostSumRed as decimal(NaN,0)\n\t),\n\tungroupBy(Size),\n\tlateral: true,\n\tignoreNullPivots: false) ~> Unpivot1"
 					}
 				],
 				"parameters": {}

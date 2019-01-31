@@ -313,6 +313,24 @@
 		},
 		"integrationRuntime2_properties_typeProperties_ssisProperties_catalogInfo_catalogAdminPassword": {
 			"value": ""
+		},
+		"Drivers_properties_typeProperties_fileName": {
+			"value": "Drivers.csv"
+		},
+		"Drivers_properties_typeProperties_folderPath": {
+			"value": "mycontainer/SampleData/USQL/Data/AmbulanceData"
+		},
+		"DriverShiftTrips_properties_typeProperties_fileName": {
+			"value": "DriverShiftTrips.csv"
+		},
+		"DriverShiftTrips_properties_typeProperties_folderPath": {
+			"value": "mycontainer/SampleData/USQL/Data/AmbulanceData"
+		},
+		"Drivers2_properties_typeProperties_fileName": {
+			"value": "Drivers.txt"
+		},
+		"Drivers2_properties_typeProperties_folderPath": {
+			"value": "mycontainer/SampleData/USQL/Data/AmbulanceData"
 		}
 	}
 }

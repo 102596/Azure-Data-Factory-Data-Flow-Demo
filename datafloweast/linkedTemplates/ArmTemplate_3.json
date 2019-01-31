@@ -998,6 +998,9 @@
 					"referenceName": "TaxiDataSQLDB",
 					"type": "LinkedServiceReference"
 				},
+				"folder": {
+					"name": "Demos"
+				},
 				"annotations": [],
 				"type": "AzureSqlTable",
 				"structure": [
@@ -1163,6 +1166,9 @@
 					"referenceName": "TaxiDataSQLDB",
 					"type": "LinkedServiceReference"
 				},
+				"folder": {
+					"name": "Demos"
+				},
 				"annotations": [],
 				"type": "AzureSqlTable",
 				"structure": [
@@ -1256,6 +1262,9 @@
 					"referenceName": "AzureSqlDatabase3",
 					"type": "LinkedServiceReference"
 				},
+				"folder": {
+					"name": "Flights"
+				},
 				"annotations": [],
 				"type": "AzureSqlTable",
 				"structure": [
@@ -1282,6 +1291,9 @@
 				"linkedServiceName": {
 					"referenceName": "AzureSqlDatabase3",
 					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Flights"
 				},
 				"annotations": [],
 				"type": "AzureSqlTable",

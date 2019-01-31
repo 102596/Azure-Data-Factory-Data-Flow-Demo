@@ -422,6 +422,30 @@
 		"integrationRuntime2_properties_typeProperties_ssisProperties_catalogInfo_catalogAdminPassword": {
 			"type": "secureString"
 		},
+		"Drivers_properties_typeProperties_fileName": {
+			"type": "string",
+			"defaultValue": "Drivers.csv"
+		},
+		"Drivers_properties_typeProperties_folderPath": {
+			"type": "string",
+			"defaultValue": "mycontainer/SampleData/USQL/Data/AmbulanceData"
+		},
+		"DriverShiftTrips_properties_typeProperties_fileName": {
+			"type": "string",
+			"defaultValue": "DriverShiftTrips.csv"
+		},
+		"DriverShiftTrips_properties_typeProperties_folderPath": {
+			"type": "string",
+			"defaultValue": "mycontainer/SampleData/USQL/Data/AmbulanceData"
+		},
+		"Drivers2_properties_typeProperties_fileName": {
+			"type": "string",
+			"defaultValue": "Drivers.txt"
+		},
+		"Drivers2_properties_typeProperties_folderPath": {
+			"type": "string",
+			"defaultValue": "mycontainer/SampleData/USQL/Data/AmbulanceData"
+		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI to storage account containing linked ARM templates"
@@ -835,6 +859,24 @@
 					},
 					"taxi_trip_fare_input_properties_typeProperties_folderPath": {
 						"value": "[parameters('taxi_trip_fare_input_properties_typeProperties_folderPath')]"
+					},
+					"Drivers_properties_typeProperties_fileName": {
+						"value": "[parameters('Drivers_properties_typeProperties_fileName')]"
+					},
+					"Drivers_properties_typeProperties_folderPath": {
+						"value": "[parameters('Drivers_properties_typeProperties_folderPath')]"
+					},
+					"DriverShiftTrips_properties_typeProperties_fileName": {
+						"value": "[parameters('DriverShiftTrips_properties_typeProperties_fileName')]"
+					},
+					"DriverShiftTrips_properties_typeProperties_folderPath": {
+						"value": "[parameters('DriverShiftTrips_properties_typeProperties_folderPath')]"
+					},
+					"Drivers2_properties_typeProperties_fileName": {
+						"value": "[parameters('Drivers2_properties_typeProperties_fileName')]"
+					},
+					"Drivers2_properties_typeProperties_folderPath": {
+						"value": "[parameters('Drivers2_properties_typeProperties_folderPath')]"
 					}
 				}
 			},

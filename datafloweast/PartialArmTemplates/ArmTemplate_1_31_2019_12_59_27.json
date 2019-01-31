@@ -1,0 +1,527 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory Name",
+			"defaultValue": "datafloweast"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/TaxiDataSQLDB')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "TaxiDataSQLDB",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Demos"
+				},
+				"type": "AzureSqlTable",
+				"structure": [
+					{
+						"name": "medallion",
+						"type": "String"
+					},
+					{
+						"name": "hack_license",
+						"type": "String"
+					},
+					{
+						"name": "vendor_id",
+						"type": "String"
+					},
+					{
+						"name": "rate_code",
+						"type": "String"
+					},
+					{
+						"name": "store_and_fwd_flag",
+						"type": "String"
+					},
+					{
+						"name": "pickup_datetime",
+						"type": "String"
+					},
+					{
+						"name": "dropoff_datetime",
+						"type": "String"
+					},
+					{
+						"name": "passenger_count",
+						"type": "Int32"
+					},
+					{
+						"name": "trip_time_in_secs",
+						"type": "Int64"
+					},
+					{
+						"name": "trip_distance",
+						"type": "Double"
+					},
+					{
+						"name": "pickup_longitude",
+						"type": "Double"
+					},
+					{
+						"name": "pickup_latitude",
+						"type": "Double"
+					},
+					{
+						"name": "dropoff_longitude",
+						"type": "Double"
+					},
+					{
+						"name": "dropoff_latitude",
+						"type": "Double"
+					}
+				],
+				"typeProperties": {
+					"tableName": "[concat('[', 'dbo].[TripData]')]"
+				}
+			}
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/TripFareLarge')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "TaxiDataSQLDB",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Demos"
+				},
+				"type": "AzureSqlTable",
+				"structure": [
+					{
+						"name": "medallion",
+						"type": "String"
+					},
+					{
+						"name": "hack_license",
+						"type": "String"
+					},
+					{
+						"name": "vendor_id",
+						"type": "String"
+					},
+					{
+						"name": "pickup_datetime",
+						"type": "String"
+					},
+					{
+						"name": "payment_type",
+						"type": "String"
+					},
+					{
+						"name": "fare_amount",
+						"type": "Double"
+					},
+					{
+						"name": "surcharge",
+						"type": "Double"
+					},
+					{
+						"name": "mta_tax",
+						"type": "Double"
+					},
+					{
+						"name": "tip_amount",
+						"type": "Double"
+					},
+					{
+						"name": "tolls_amount",
+						"type": "Double"
+					},
+					{
+						"name": "total_amount",
+						"type": "Double"
+					}
+				],
+				"typeProperties": {
+					"tableName": "[concat('[', 'dbo].[TripFare]')]"
+				}
+			}
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/airlines')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase3",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Flights"
+				},
+				"type": "AzureSqlTable",
+				"structure": [
+					{
+						"name": "Code",
+						"type": "Int32"
+					},
+					{
+						"name": "Airline_Code",
+						"type": "String"
+					}
+				],
+				"typeProperties": {
+					"tableName": "[concat('[', 'dbo].[Airline]')]"
+				}
+			}
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/airports')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase3",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Flights"
+				},
+				"type": "AzureSqlTable",
+				"structure": [
+					{
+						"name": "Code",
+						"type": "String"
+					},
+					{
+						"name": "City_Airport",
+						"type": "String"
+					}
+				],
+				"typeProperties": {
+					"tableName": "[concat('[', 'dbo].[Airport]')]"
+				}
+			}
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Currency Converter')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"description": "Sample demo data flow to convert currencies",
+				"folder": {
+					"name": "Demos"
+				},
+				"sources": [
+					{
+						"dataset": {
+							"referenceName": "CurrencyDatasetUSD",
+							"type": "DatasetReference"
+						},
+						"name": "USDCurrency",
+						"script": "source(output(\n\t\tPreviousConversionRate as double,\n\t\tCountry as string,\n\t\tDateTime1 as string,\n\t\tCurrentConversionRate as double\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> USDCurrency"
+					},
+					{
+						"dataset": {
+							"referenceName": "CurrencyDatasetUSD",
+							"type": "DatasetReference"
+						},
+						"name": "CADSource",
+						"script": "source(output(\n\t\tPreviousConversionRate as double,\n\t\tCountry as string,\n\t\tDateTime1 as string,\n\t\tCurrentConversionRate as double\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> CADSource"
+					}
+				],
+				"sinks": [
+					{
+						"dataset": {
+							"referenceName": "USDOutput",
+							"type": "DatasetReference"
+						},
+						"name": "USDSink",
+						"script": "ConditionalSplit1@USD sink(mapColumn(\n\t\tPreviousConversionRate = ConditionalSplit1@PreviousConversionRate,\n\t\tCountry = ConditionalSplit1@Country,\n\t\tDateTime1 = ConditionalSplit1@DateTime1,\n\t\tCurrentConversionRate = ConditionalSplit1@CurrentConversionRate,\n\t\tNewCurrencyRate\n\t),\n\tpartitionBy('hash', 1),\n\tsaveMode:'overwrite') ~> USDSink"
+					},
+					{
+						"dataset": {
+							"referenceName": "CADOutput",
+							"type": "DatasetReference"
+						},
+						"name": "CADSink",
+						"script": "ConditionalSplit1@CAD sink(mapColumn(\n\t\tPreviousConversionRate = ConditionalSplit1@PreviousConversionRate,\n\t\tCountry = ConditionalSplit1@Country,\n\t\tDateTime1 = ConditionalSplit1@DateTime1,\n\t\tCurrentConversionRate = ConditionalSplit1@CurrentConversionRate,\n\t\tNewCurrencyRate\n\t),\n\tpartitionBy('hash', 1),\n\tsaveMode:'overwrite') ~> CADSink"
+					}
+				],
+				"transformations": [
+					{
+						"name": "NewCurrencyColumn",
+						"description": "Create a new calculated column from currency rate",
+						"script": "Join1 derive(NewCurrencyRate = round(USDCurrency@CurrentConversionRate*1.25)) ~> NewCurrencyColumn"
+					},
+					{
+						"name": "ConditionalSplit1",
+						"description": "Split the data on state to create 2 streams",
+						"script": "NewCurrencyColumn split(USDCurrency@Country == 'USD',\n\tUSDCurrency@Country == 'CAD',\n\tdisjoint: false) ~> ConditionalSplit1@(USD, CAD)"
+					},
+					{
+						"name": "Join1",
+						"script": "USDCurrency, CADSource join(USDCurrency@PreviousConversionRate == CADSource@PreviousConversionRate,\n\tjoinType:'left',\n\tbroadcast: 'none')~> Join1"
+					}
+				]
+			}
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/soccerETL')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Soccer"
+				},
+				"sources": [
+					{
+						"dataset": {
+							"referenceName": "soccer_events",
+							"type": "DatasetReference"
+						},
+						"name": "SpecifySchemaExtracts",
+						"script": "source(output(\n\t\tid_odsp as string,\n\t\tid_event as string,\n\t\tsort_order as integer,\n\t\ttime as integer,\n\t\ttext as string,\n\t\tevent_type as string,\n\t\tevent_type2 as string,\n\t\tside as string,\n\t\tevent_team as string,\n\t\topponent as string,\n\t\tplayer as string,\n\t\tplayer2 as string,\n\t\tplayer_in as string,\n\t\tplayer_out as string,\n\t\tshot_place as string,\n\t\tshot_outcome as string,\n\t\tis_goal as string,\n\t\tlocation as string,\n\t\tbodypart as string,\n\t\tassist_method as string,\n\t\tsituation as string,\n\t\tfast_break as string\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> SpecifySchemaExtracts"
+					},
+					{
+						"dataset": {
+							"referenceName": "locationMap",
+							"type": "DatasetReference"
+						},
+						"name": "locationMap",
+						"script": "source(output(\n\t\tType as string,\n\t\tName as any\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> locationMap"
+					}
+				],
+				"sinks": [
+					{
+						"dataset": {
+							"referenceName": "AzureBlobBaseballOutput",
+							"type": "DatasetReference"
+						},
+						"name": "sinkToDW",
+						"script": "TimeBins sink(saveMode:'overwrite') ~> sinkToDW"
+					}
+				],
+				"transformations": [
+					{
+						"name": "DictionaryMapping1",
+						"script": "SpecifySchemaExtracts derive(eventTypeMap = case(\r\n    event_type == '0','Announcement',\r\n    event_type == '1','Attempt',\r\n    event_type == '2','Corner',\r\n    event_type == '3','Foul',\r\n    event_type == '4','Yellow Card',\r\n    event_type == '5','Second yellow card',\r\n    event_type == '6','Red card',\r\n    event_type == '7','Substitution',\r\n    event_type == '8','Free kick won',\r\n    event_type == '9','Offside',\r\n    event_type == '10','Hand ball',\r\n    event_type == '11','Penalty conceded',\r\n    event_type == '99', 'NA'\r\n),\n\t\ttime = toInteger(time)) ~> DictionaryMapping1"
+					},
+					{
+						"name": "JoinStringDataViaLookup",
+						"script": "DictionaryMapping1, locationMap lookup(location == Type,\n\tbroadcast: 'none')~> JoinStringDataViaLookup"
+					},
+					{
+						"name": "TimeBins",
+						"script": "ColumnSelectionNaming window(over(time),\n\tasc(event_type2, true),\n\tTimeBins = nTile(10)) ~> TimeBins"
+					},
+					{
+						"name": "ColumnSelectionNaming",
+						"script": "JoinStringDataViaLookup select(mapColumn(\n\t\tid_odsp,\n\t\tid_event,\n\t\tsort_order,\n\t\ttime,\n\t\ttext,\n\t\tevent_type2,\n\t\tside,\n\t\tevent_team,\n\t\topponent,\n\t\tplayer,\n\t\tplayer2,\n\t\tplayer_in,\n\t\tplayer_out,\n\t\tshot_place,\n\t\tshot_outcome,\n\t\tis_goal,\n\t\tlocation,\n\t\tbodypart,\n\t\tassist_method,\n\t\tsituation,\n\t\tfast_break,\n\t\teventTypeName = eventTypeMap,\n\t\tLocationName = Name\n\t))~> ColumnSelectionNaming"
+					}
+				]
+			}
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Drivers')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"type": "AzureBlob",
+				"structure": [
+					{
+						"name": "Prop_0",
+						"type": "String"
+					},
+					{
+						"name": "Prop_1",
+						"type": "String"
+					},
+					{
+						"name": "Prop_2",
+						"type": "String"
+					},
+					{
+						"name": "Prop_3",
+						"type": "String"
+					},
+					{
+						"name": "Prop_4",
+						"type": "String"
+					},
+					{
+						"name": "Prop_5",
+						"type": "String"
+					},
+					{
+						"name": "Prop_6",
+						"type": "String"
+					},
+					{
+						"name": "Prop_7",
+						"type": "String"
+					}
+				],
+				"typeProperties": {
+					"format": {
+						"type": "TextFormat",
+						"columnDelimiter": "\t",
+						"rowDelimiter": "",
+						"quoteChar": "\"",
+						"nullValue": "\\N",
+						"encodingName": null,
+						"treatEmptyAsNull": true,
+						"skipLineCount": 0,
+						"firstRowAsHeader": false
+					},
+					"fileName": "Drivers.csv",
+					"folderPath": "mycontainer/SampleData/USQL/Data/AmbulanceData"
+				}
+			}
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DriverShiftTrips')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"type": "AzureBlob",
+				"structure": [
+					{
+						"name": "Prop_0",
+						"type": "String"
+					},
+					{
+						"name": "Prop_1",
+						"type": "String"
+					},
+					{
+						"name": "Prop_2",
+						"type": "String"
+					},
+					{
+						"name": "Prop_3",
+						"type": "String"
+					}
+				],
+				"typeProperties": {
+					"format": {
+						"type": "TextFormat",
+						"columnDelimiter": ",",
+						"rowDelimiter": "",
+						"quoteChar": "\"",
+						"nullValue": "\\N",
+						"encodingName": null,
+						"treatEmptyAsNull": true,
+						"skipLineCount": 0,
+						"firstRowAsHeader": false
+					},
+					"fileName": "DriverShiftTrips.csv",
+					"folderPath": "mycontainer/SampleData/USQL/Data/AmbulanceData"
+				}
+			}
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dataflow2')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"sources": [
+					{
+						"dataset": {
+							"referenceName": "DriverShiftTrips",
+							"type": "DatasetReference"
+						},
+						"name": "DriverShiftTrips",
+						"script": "source(output(\n\t\tProp_0 as string,\n\t\tdriverid as string,\n\t\tProp_2 as string,\n\t\tProp_3 as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> DriverShiftTrips"
+					},
+					{
+						"dataset": {
+							"referenceName": "Drivers",
+							"type": "DatasetReference"
+						},
+						"name": "source",
+						"script": "source(output(\n\t\tProp_0 as string,\n\t\tProp_1 as string,\n\t\tProp_2 as string,\n\t\tProp_3 as string,\n\t\tProp_4 as string,\n\t\tProp_5 as string,\n\t\tProp_6 as string,\n\t\tProp_7 as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> source"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DriverShiftTrips')]",
+				"[concat(variables('factoryId'), '/datasets/Drivers')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Drivers2')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"type": "AzureBlob",
+				"structure": [
+					{
+						"name": "Prop_0",
+						"type": "String"
+					},
+					{
+						"name": "Prop_1",
+						"type": "String"
+					},
+					{
+						"name": "Prop_2",
+						"type": "String"
+					},
+					{
+						"name": "Prop_3",
+						"type": "String"
+					},
+					{
+						"name": "Prop_4",
+						"type": "String"
+					},
+					{
+						"name": "Prop_5",
+						"type": "String"
+					},
+					{
+						"name": "Prop_6",
+						"type": "String"
+					},
+					{
+						"name": "Prop_7",
+						"type": "String"
+					}
+				],
+				"typeProperties": {
+					"format": {
+						"type": "TextFormat",
+						"columnDelimiter": "\t",
+						"rowDelimiter": "",
+						"quoteChar": "\"",
+						"nullValue": "\\N",
+						"encodingName": null,
+						"treatEmptyAsNull": true,
+						"skipLineCount": 0,
+						"firstRowAsHeader": false
+					},
+					"fileName": "Drivers.txt",
+					"folderPath": "mycontainer/SampleData/USQL/Data/AmbulanceData"
+				}
+			}
+		}
+	]
+}

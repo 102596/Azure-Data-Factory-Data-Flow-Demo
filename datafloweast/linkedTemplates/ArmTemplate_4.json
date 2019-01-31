@@ -94,6 +94,30 @@
 		"taxi_trip_fare_input_properties_typeProperties_folderPath": {
 			"type": "string",
 			"defaultValue": "mycontainer/SampleData"
+		},
+		"Drivers_properties_typeProperties_fileName": {
+			"type": "string",
+			"defaultValue": "Drivers.csv"
+		},
+		"Drivers_properties_typeProperties_folderPath": {
+			"type": "string",
+			"defaultValue": "mycontainer/SampleData/USQL/Data/AmbulanceData"
+		},
+		"DriverShiftTrips_properties_typeProperties_fileName": {
+			"type": "string",
+			"defaultValue": "DriverShiftTrips.csv"
+		},
+		"DriverShiftTrips_properties_typeProperties_folderPath": {
+			"type": "string",
+			"defaultValue": "mycontainer/SampleData/USQL/Data/AmbulanceData"
+		},
+		"Drivers2_properties_typeProperties_fileName": {
+			"type": "string",
+			"defaultValue": "Drivers.txt"
+		},
+		"Drivers2_properties_typeProperties_folderPath": {
+			"type": "string",
+			"defaultValue": "mycontainer/SampleData/USQL/Data/AmbulanceData"
 		}
 	},
 	"variables": {
@@ -704,6 +728,179 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/Drivers')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureBlob",
+				"structure": [
+					{
+						"name": "Prop_0",
+						"type": "String"
+					},
+					{
+						"name": "Prop_1",
+						"type": "String"
+					},
+					{
+						"name": "Prop_2",
+						"type": "String"
+					},
+					{
+						"name": "Prop_3",
+						"type": "String"
+					},
+					{
+						"name": "Prop_4",
+						"type": "String"
+					},
+					{
+						"name": "Prop_5",
+						"type": "String"
+					},
+					{
+						"name": "Prop_6",
+						"type": "String"
+					},
+					{
+						"name": "Prop_7",
+						"type": "String"
+					}
+				],
+				"typeProperties": {
+					"format": {
+						"type": "TextFormat",
+						"columnDelimiter": "\t",
+						"rowDelimiter": "",
+						"quoteChar": "\"",
+						"nullValue": "\\N",
+						"encodingName": null,
+						"treatEmptyAsNull": true,
+						"skipLineCount": 0,
+						"firstRowAsHeader": false
+					},
+					"fileName": "[parameters('Drivers_properties_typeProperties_fileName')]",
+					"folderPath": "[parameters('Drivers_properties_typeProperties_folderPath')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DriverShiftTrips')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureBlob",
+				"structure": [
+					{
+						"name": "Prop_0",
+						"type": "String"
+					},
+					{
+						"name": "Prop_1",
+						"type": "String"
+					},
+					{
+						"name": "Prop_2",
+						"type": "String"
+					},
+					{
+						"name": "Prop_3",
+						"type": "String"
+					}
+				],
+				"typeProperties": {
+					"format": {
+						"type": "TextFormat",
+						"columnDelimiter": ",",
+						"rowDelimiter": "",
+						"quoteChar": "\"",
+						"nullValue": "\\N",
+						"encodingName": null,
+						"treatEmptyAsNull": true,
+						"skipLineCount": 0,
+						"firstRowAsHeader": false
+					},
+					"fileName": "[parameters('DriverShiftTrips_properties_typeProperties_fileName')]",
+					"folderPath": "[parameters('DriverShiftTrips_properties_typeProperties_folderPath')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Drivers2')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureBlob",
+				"structure": [
+					{
+						"name": "Prop_0",
+						"type": "String"
+					},
+					{
+						"name": "Prop_1",
+						"type": "String"
+					},
+					{
+						"name": "Prop_2",
+						"type": "String"
+					},
+					{
+						"name": "Prop_3",
+						"type": "String"
+					},
+					{
+						"name": "Prop_4",
+						"type": "String"
+					},
+					{
+						"name": "Prop_5",
+						"type": "String"
+					},
+					{
+						"name": "Prop_6",
+						"type": "String"
+					},
+					{
+						"name": "Prop_7",
+						"type": "String"
+					}
+				],
+				"typeProperties": {
+					"format": {
+						"type": "TextFormat",
+						"columnDelimiter": "\t",
+						"rowDelimiter": "",
+						"quoteChar": "\"",
+						"nullValue": "\\N",
+						"encodingName": null,
+						"treatEmptyAsNull": true,
+						"skipLineCount": 0,
+						"firstRowAsHeader": false
+					},
+					"fileName": "[parameters('Drivers2_properties_typeProperties_fileName')]",
+					"folderPath": "[parameters('Drivers2_properties_typeProperties_folderPath')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/CopyPipeline_cce')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-07-01-preview",
@@ -1162,188 +1359,6 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/newbattingtable')]"
 			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Baseball 1 Norm Batting Stats')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-07-01-preview",
-			"properties": {
-				"folder": {
-					"name": "Baseball"
-				},
-				"sources": [
-					{
-						"dataset": {
-							"referenceName": "BaseballBatting",
-							"type": "DatasetReference"
-						},
-						"name": "sourceBatting",
-						"script": "source(output(\n\t\tplayerID as string,\n\t\tyearID as string,\n\t\tstint as string,\n\t\tteamID as string,\n\t\tlgID as string,\n\t\tG as integer,\n\t\tAB as integer,\n\t\tR as integer,\n\t\tH as integer,\n\t\tH2B as integer,\n\t\tH3B as integer,\n\t\tHR as integer,\n\t\tRBI as integer,\n\t\tSB as integer,\n\t\tCS as integer,\n\t\tBB as integer,\n\t\tSO as integer,\n\t\tIBB as integer,\n\t\tHBP as integer,\n\t\tSH as integer,\n\t\tSF as integer,\n\t\tGIDP as integer\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> sourceBatting",
-						"typeProperties": {}
-					},
-					{
-						"dataset": {
-							"referenceName": "PlayersBlob",
-							"type": "DatasetReference"
-						},
-						"name": "sourcePlayer",
-						"script": "source(output(\n\t\tplayerID as string,\n\t\tbirthYear as string,\n\t\tbirthMonth as string,\n\t\tbirthDay as string,\n\t\tbirthCountry as string,\n\t\tbirthState as string,\n\t\tbirthCity as string,\n\t\tdeathYear as string,\n\t\tdeathMonth as string,\n\t\tdeathDay as string,\n\t\tdeathCountry as string,\n\t\tdeathState as string,\n\t\tdeathCity as string,\n\t\tnameFirst as string,\n\t\tnameLast as string,\n\t\tnameGiven as string,\n\t\tweight as string,\n\t\theight as string,\n\t\tbats as string,\n\t\tthrows as string,\n\t\tdebut as string,\n\t\tfinalGame as string,\n\t\tretroID as string,\n\t\tbbrefID as string\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> sourcePlayer",
-						"typeProperties": {}
-					}
-				],
-				"sinks": [
-					{
-						"dataset": {
-							"referenceName": "AzureBlobBaseballOutput",
-							"type": "DatasetReference"
-						},
-						"name": "sink1",
-						"script": "Join1 sink(mapColumn(\n\t\tBA,\n\t\tOBP,\n\t\tSLG,\n\t\tbirthYear,\n\t\tbirthMonth,\n\t\tbirthDay,\n\t\tbirthCountry,\n\t\tbirthState,\n\t\tbirthCity,\n\t\tdeathYear,\n\t\tdeathMonth,\n\t\tdeathDay,\n\t\tdeathCountry,\n\t\tdeathState,\n\t\tdeathCity,\n\t\tnameFirst,\n\t\tnameLast,\n\t\tnameGiven,\n\t\tweight,\n\t\theight,\n\t\tbats,\n\t\tthrows,\n\t\tdebut,\n\t\tfinalGame,\n\t\tretroID,\n\t\tbbrefID,\n\t\tplayerID = OrigSourceBatting@playerID,\n\t\tyearID = OrigSourceBatting@yearID,\n\t\tstint,\n\t\tteamID,\n\t\tlgID,\n\t\tG,\n\t\tAB,\n\t\tR,\n\t\tH,\n\t\tH2B,\n\t\tH3B,\n\t\tHR,\n\t\tRBI,\n\t\tSB,\n\t\tCS,\n\t\tBB,\n\t\tSO,\n\t\tIBB,\n\t\tHBP,\n\t\tSH,\n\t\tSF,\n\t\tGIDP,\n\t\tTB\n\t),\n\tsaveMode:'overwrite') ~> sink1",
-						"maxConcurrentConnections": 10
-					}
-				],
-				"transformations": [
-					{
-						"name": "createAggs",
-						"script": "CalcTotalBases aggregate(groupBy(playerID,\n\t\tyearID),\n\tBA = round(avg(H/AB),3),\n\t\tOBP = round(avg((H+BB+HBP)/(AB+BB+HBP+SF)),3),\n\t\tSLG = round(avg(TB/AB),3)) ~> createAggs"
-					},
-					{
-						"name": "Join1",
-						"script": "createAggs, PlayerInfoPlusOrigStats join(createAggs@playerID == sourcePlayer@playerID,\n\tjoinType:'inner',\n\tbroadcast: 'none')~> Join1"
-					},
-					{
-						"name": "PlayerInfoPlusOrigStats",
-						"script": "sourcePlayer, OrigSourceBatting join(sourcePlayer@playerID == OrigSourceBatting@playerID,\n\tjoinType:'inner',\n\tbroadcast: 'none')~> PlayerInfoPlusOrigStats"
-					},
-					{
-						"name": "CalcTotalBases",
-						"script": "sourceBatting derive(TB = (HR * 4) + (H3B * 3) + (H2B * 2) + (H-H2B-H3B-HR)) ~> CalcTotalBases"
-					},
-					{
-						"name": "OrigSourceBatting",
-						"script": "CalcTotalBases select()~> OrigSourceBatting"
-					}
-				],
-				"parameters": {}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Baseball 2 Adv Stats')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-07-01-preview",
-			"properties": {
-				"description": "Let's now create the advanced Bill James Sabermetrics stats",
-				"folder": {
-					"name": "Baseball"
-				},
-				"sources": [
-					{
-						"dataset": {
-							"referenceName": "SQLDBBaseball2",
-							"type": "DatasetReference"
-						},
-						"name": "source1",
-						"script": "source(output(\n\t\tBA as double,\n\t\tOBP as double,\n\t\tSLG as double,\n\t\tTB as integer,\n\t\tbirthYear as string,\n\t\tbirthMonth as string,\n\t\tbirthDay as string,\n\t\tbirthCountry as string,\n\t\tbirthState as string,\n\t\tbirthCity as string,\n\t\tdeathYear as string,\n\t\tdeathMonth as string,\n\t\tdeathDay as string,\n\t\tdeathCountry as string,\n\t\tdeathState as string,\n\t\tdeathCity as string,\n\t\tnameFirst as string,\n\t\tnameLast as string,\n\t\tnameGiven as string,\n\t\tweight as string,\n\t\theight as string,\n\t\tbats as string,\n\t\tthrows as string,\n\t\tdebut as string,\n\t\tfinalGame as string,\n\t\tretroID as string,\n\t\tbbrefID as string,\n\t\tplayerID as string,\n\t\tyearID as string,\n\t\tstint as string,\n\t\tteamID as string,\n\t\tlgID as string,\n\t\tG as integer,\n\t\tAB as integer,\n\t\tR as integer,\n\t\tH as integer,\n\t\tH2B as integer,\n\t\tH3B as integer,\n\t\tHR as integer,\n\t\tRBI as integer,\n\t\tSB as integer,\n\t\tCS as integer,\n\t\tBB as integer,\n\t\tSO as integer,\n\t\tIBB as integer,\n\t\tHBP as integer,\n\t\tSH as integer,\n\t\tSF as integer,\n\t\tGIDP as integer\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> source1",
-						"typeProperties": {}
-					}
-				],
-				"sinks": [
-					{
-						"dataset": {
-							"referenceName": "DWSabermetrics",
-							"type": "DatasetReference"
-						},
-						"name": "sink1",
-						"script": "RunsCreated sink(mapColumn(\n\t\tBA,\n\t\tOBP,\n\t\tSLG,\n\t\tTB,\n\t\tbirthYear,\n\t\tbirthMonth,\n\t\tbirthDay,\n\t\tbirthCountry,\n\t\tbirthState,\n\t\tbirthCity,\n\t\tdeathYear,\n\t\tdeathMonth,\n\t\tdeathDay,\n\t\tdeathCountry,\n\t\tdeathState,\n\t\tdeathCity,\n\t\tnameFirst,\n\t\tnameLast,\n\t\tnameGiven,\n\t\tweight,\n\t\theight,\n\t\tbats,\n\t\tthrows,\n\t\tdebut,\n\t\tfinalGame,\n\t\tretroID,\n\t\tbbrefID,\n\t\tplayerID,\n\t\tyearID,\n\t\tstint,\n\t\tteamID,\n\t\tlgID,\n\t\tG,\n\t\tAB,\n\t\tR,\n\t\tH,\n\t\tH2B,\n\t\tH3B,\n\t\tHR,\n\t\tRBI,\n\t\tSB,\n\t\tCS,\n\t\tBB,\n\t\tSO,\n\t\tIBB,\n\t\tHBP,\n\t\tSH,\n\t\tSF,\n\t\tGIDP,\n\t\tRunsCreated\n\t),\n\tsaveMode:'overwrite') ~> sink1"
-					}
-				],
-				"transformations": [
-					{
-						"name": "RunsCreated",
-						"script": "source1 derive(RunsCreated = round(  ((H + BB) * TB) / (AB + BB), 3)) ~> RunsCreated"
-					}
-				],
-				"parameters": {}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/BugBash1')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-07-01-preview",
-			"properties": {
-				"folder": {
-					"name": "Bug Bashes"
-				},
-				"sources": [
-					{
-						"dataset": {
-							"referenceName": "SQLDB_SalesHeader",
-							"type": "DatasetReference"
-						},
-						"name": "SourceSalesHeader",
-						"script": "source(output(\n\t\tSalesOrderID as integer,\n\t\tRevisionNumber as string,\n\t\tOrderDate as date,\n\t\tDueDate as date,\n\t\tShipDate as date,\n\t\tStatus as string,\n\t\tOnlineOrderFlag as boolean,\n\t\tSalesOrderNumber as string,\n\t\tPurchaseOrderNumber as string,\n\t\tAccountNumber as string,\n\t\tCustomerID as integer,\n\t\tShipToAddressID as integer,\n\t\tBillToAddressID as integer,\n\t\tShipMethod as string,\n\t\tCreditCardApprovalCode as string,\n\t\tSubTotal as decimal(10,0),\n\t\tTaxAmt as decimal(10,0),\n\t\tFreight as decimal(10,0),\n\t\tTotalDue as decimal(10,0),\n\t\tComment as string,\n\t\trowguid as string,\n\t\tModifiedDate as date\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> SourceSalesHeader",
-						"typeProperties": {}
-					},
-					{
-						"dataset": {
-							"referenceName": "SQLDB_SalesDetail",
-							"type": "DatasetReference"
-						},
-						"name": "SourceSalesDetail",
-						"script": "source(output(\n\t\tSalesOrderID as integer,\n\t\tSalesOrderDetailID as integer,\n\t\tOrderQty as short,\n\t\tProductID as integer,\n\t\tUnitPrice as decimal(10,0),\n\t\tUnitPriceDiscount as decimal(10,0),\n\t\tLineTotal as decimal(10,0),\n\t\trowguid as string,\n\t\tModifiedDate as date\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> SourceSalesDetail",
-						"typeProperties": {}
-					},
-					{
-						"dataset": {
-							"referenceName": "SQLDB_Products",
-							"type": "DatasetReference"
-						},
-						"name": "SourceProduct",
-						"script": "source(output(\n\t\tProductID as integer,\n\t\tName as string,\n\t\tProductNumber as string,\n\t\tColor as string,\n\t\tStandardCost as decimal(10,0),\n\t\tListPrice as decimal(10,0),\n\t\tSize as string,\n\t\tWeight as decimal(10,0),\n\t\tProductCategoryID as integer,\n\t\tProductModelID as integer,\n\t\tSellStartDate as date,\n\t\tSellEndDate as date,\n\t\tDiscontinuedDate as date,\n\t\tThumbNailPhoto as string,\n\t\tThumbnailPhotoFileName as string,\n\t\trowguid as string,\n\t\tModifiedDate as date\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> SourceProduct",
-						"typeProperties": {}
-					}
-				],
-				"sinks": [
-					{
-						"dataset": {
-							"referenceName": "ADW_FactSales",
-							"type": "DatasetReference"
-						},
-						"name": "SinkFactSales",
-						"script": "Join1 sink(mapColumn(\n\t\tOrderTotal,\n\t\tRevisionNumber,\n\t\tOrderDate,\n\t\tDueDate,\n\t\tShipDate,\n\t\tStatus,\n\t\tOnlineOrderFlag,\n\t\tSalesOrderNumber,\n\t\tPurchaseOrderNumber,\n\t\tAccountNumber,\n\t\tCustomerID,\n\t\tShipToAddressID,\n\t\tBillToAddressID,\n\t\tShipMethod,\n\t\tCreditCardApprovalCode,\n\t\tSubTotal,\n\t\tTaxAmt,\n\t\tFreight,\n\t\tTotalDue,\n\t\tComment,\n\t\trowguid,\n\t\tModifiedDate\n\t),\n\tsaveMode:'overwrite') ~> SinkFactSales"
-					},
-					{
-						"dataset": {
-							"referenceName": "ADW_DimProduct",
-							"type": "DatasetReference"
-						},
-						"name": "sinkDimProd",
-						"script": "Aggregate2 sink(mapColumn(\n\t\tName,\n\t\tProdCount\n\t),\n\tsaveMode:'overwrite') ~> sinkDimProd"
-					}
-				],
-				"transformations": [
-					{
-						"name": "Aggregate1",
-						"script": "SourceSalesDetail aggregate(groupBy(SalesOrderID),\n\tOrderTotal = sum(LineTotal)) ~> Aggregate1"
-					},
-					{
-						"name": "Join1",
-						"script": "Aggregate1, SourceSalesHeader join(Aggregate1@SalesOrderID == SourceSalesHeader@SalesOrderID,\n\tjoinType:'inner',\n\tbroadcast: 'none')~> Join1"
-					},
-					{
-						"name": "Join2",
-						"script": "SourceSalesDetail, SourceProduct join(SourceSalesDetail@ProductID == SourceProduct@ProductID,\n\tjoinType:'inner',\n\tbroadcast: 'none')~> Join2"
-					},
-					{
-						"name": "Aggregate2",
-						"script": "Join2 aggregate(groupBy(Name),\n\tProdCount = sum(1)) ~> Aggregate2"
-					}
-				],
-				"parameters": {}
-			},
-			"dependsOn": []
 		}
 	]
 }
