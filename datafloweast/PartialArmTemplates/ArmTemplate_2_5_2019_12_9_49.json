@@ -1,0 +1,375 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory Name",
+			"defaultValue": "datafloweast"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline7')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Data Flow",
+						"type": "ExecuteDataFlow",
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "dataflow2",
+								"type": "DataFlowReference"
+							},
+							"linkedService": {
+								"referenceName": "adbls002",
+								"type": "LinkedServiceReference"
+							}
+						}
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/dataflow2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Tweets')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"type": "AzureBlob",
+				"structure": [
+					{
+						"name": "TweetDate",
+						"type": "String"
+					},
+					{
+						"name": "TweetTime",
+						"type": "String"
+					},
+					{
+						"name": "TweetAuthor",
+						"type": "String"
+					},
+					{
+						"name": "TweetText",
+						"type": "String"
+					}
+				],
+				"typeProperties": {
+					"format": {
+						"type": "TextFormat",
+						"columnDelimiter": ",",
+						"rowDelimiter": "",
+						"quoteChar": "\"",
+						"nullValue": "\\N",
+						"encodingName": null,
+						"treatEmptyAsNull": true,
+						"skipLineCount": 0,
+						"firstRowAsHeader": false
+					},
+					"fileName": "MikeDoesBigDataTweets.csv",
+					"folderPath": "mycontainer/SampleData/USQL"
+				}
+			}
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/TweetsMike')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"type": "AzureBlob",
+				"structure": [
+					{
+						"name": "TweetDate",
+						"type": "String"
+					},
+					{
+						"name": "TweetTime",
+						"type": "String"
+					},
+					{
+						"name": "TweetAuthor",
+						"type": "String"
+					},
+					{
+						"name": "TweetText",
+						"type": "String"
+					}
+				],
+				"typeProperties": {
+					"format": {
+						"type": "TextFormat",
+						"columnDelimiter": ",",
+						"rowDelimiter": "",
+						"quoteChar": "\"",
+						"nullValue": "\\N",
+						"encodingName": null,
+						"treatEmptyAsNull": true,
+						"skipLineCount": 0,
+						"firstRowAsHeader": false
+					},
+					"fileName": "MikeDoesBigDataTweets.csv",
+					"folderPath": "mycontainer/SampleData/USQL"
+				}
+			}
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Currency Converter')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"description": "Sample demo data flow to convert currencies",
+				"folder": {
+					"name": "Demos"
+				},
+				"sources": [
+					{
+						"dataset": {
+							"referenceName": "CurrencyDatasetUSD",
+							"type": "DatasetReference"
+						},
+						"name": "USDCurrency",
+						"script": "source(output(\n\t\tPreviousConversionRate as double,\n\t\tCountry as string,\n\t\tDateTime1 as string,\n\t\tCurrentConversionRate as double\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> USDCurrency"
+					},
+					{
+						"dataset": {
+							"referenceName": "CurrencyDatasetUSD",
+							"type": "DatasetReference"
+						},
+						"name": "CADSource",
+						"script": "source(output(\n\t\tPreviousConversionRate as double,\n\t\tCountry as string,\n\t\tDateTime1 as string,\n\t\tCurrentConversionRate as double\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> CADSource"
+					}
+				],
+				"transformations": [
+					{
+						"name": "NewCurrencyColumn",
+						"description": "Create a new calculated column from currency rate",
+						"script": "Join1 derive(NewCurrencyRate = round(USDCurrency@CurrentConversionRate*1.25)) ~> NewCurrencyColumn"
+					},
+					{
+						"name": "ConditionalSplit1",
+						"description": "Split the data on state to create 2 streams",
+						"script": "NewCurrencyColumn split(USDCurrency@Country == 'USD',\n\tUSDCurrency@Country == 'CAD',\n\tdisjoint: false) ~> ConditionalSplit1@(USD, CAD)"
+					},
+					{
+						"name": "Join1",
+						"script": "USDCurrency, CADSource join(USDCurrency@PreviousConversionRate == CADSource@PreviousConversionRate,\n\tjoinType:'left',\n\tbroadcast: 'none')~> Join1"
+					}
+				]
+			}
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SCD Dataflow 2')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Demos"
+				}
+			}
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SCDType2')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Demos"
+				},
+				"sources": [
+					{
+						"dataset": {
+							"referenceName": "SQLProducts",
+							"type": "DatasetReference"
+						},
+						"name": "SQLProducts",
+						"script": "source(output(\n\t\tProductID as integer,\n\t\tName as string,\n\t\tProductNumber as string,\n\t\tColor as string,\n\t\tStandardCost as decimal(10,0),\n\t\tListPrice as decimal(10,0),\n\t\tSize as string,\n\t\tWeight as decimal(10,0)\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> SQLProducts"
+					},
+					{
+						"dataset": {
+							"referenceName": "DimProd",
+							"type": "DatasetReference"
+						},
+						"name": "DimProd",
+						"script": "source(output(\n\t\tProductKey as integer,\n\t\tProductAlternateKey as string,\n\t\tProductSubcategoryKey as integer,\n\t\tWeightUnitMeasureCode as string,\n\t\tSizeUnitMeasureCode as string,\n\t\tEnglishProductName as string,\n\t\tSpanishProductName as string,\n\t\tFrenchProductName as string,\n\t\tStandardCost as decimal(10,0),\n\t\tFinishedGoodsFlag as boolean,\n\t\tColor as string,\n\t\tSafetyStockLevel as short,\n\t\tReorderPoint as short,\n\t\tListPrice as decimal(10,0),\n\t\tSize as string,\n\t\tSizeRange as string,\n\t\tWeight as double,\n\t\tDaysToManufacture as integer,\n\t\tProductLine as string,\n\t\tDealerPrice as decimal(10,0),\n\t\tClass as string,\n\t\tStyle as string,\n\t\tModelName as string,\n\t\tEnglishDescription as string,\n\t\tFrenchDescription as string,\n\t\tChineseDescription as string,\n\t\tArabicDescription as string,\n\t\tHebrewDescription as string,\n\t\tThaiDescription as string,\n\t\tGermanDescription as string,\n\t\tJapaneseDescription as string,\n\t\tTurkishDescription as string,\n\t\tStartDate as timestamp,\n\t\tEndDate as timestamp,\n\t\tStatus as string\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> DimProd"
+					}
+				],
+				"sinks": [
+					{
+						"dataset": {
+							"referenceName": "ADW_DimProduct",
+							"type": "DatasetReference"
+						},
+						"name": "sink1",
+						"script": "SetAttributes sink(format: 'table',\n\tstaged: false,\n\tmapColumn(\n\t\tProductKey = ProductID,\n\t\tProductAlternateKey = surrogatekey,\n\t\tProductSubcategoryKey,\n\t\tWeightUnitMeasureCode,\n\t\tSizeUnitMeasureCode,\n\t\tEnglishProductName = Name,\n\t\tSpanishProductName,\n\t\tFrenchProductName,\n\t\tStandardCost,\n\t\tFinishedGoodsFlag = mybit,\n\t\tColor,\n\t\tSafetyStockLevel,\n\t\tReorderPoint,\n\t\tListPrice,\n\t\tSize,\n\t\tSizeRange,\n\t\tWeight,\n\t\tDaysToManufacture,\n\t\tProductLine,\n\t\tDealerPrice,\n\t\tClass,\n\t\tStyle,\n\t\tModelName,\n\t\tEnglishDescription,\n\t\tFrenchDescription,\n\t\tChineseDescription,\n\t\tArabicDescription,\n\t\tHebrewDescription,\n\t\tThaiDescription,\n\t\tGermanDescription,\n\t\tJapaneseDescription,\n\t\tTurkishDescription,\n\t\tStartDate,\n\t\tEndDate,\n\t\tStatus\n\t),\n\tsaveMode:'append') ~> sink1"
+					}
+				],
+				"transformations": [
+					{
+						"name": "LookupKeys",
+						"script": "SQLProducts, DimProd join(ProductID == ProductKey,\n\tjoinType:'left',\n\tbroadcast: 'none')~> LookupKeys"
+					},
+					{
+						"name": "ConditionalSplit1",
+						"script": "ColumnSelection split(isNull(ProductAlternateKey),\n\tdisjoint: false) ~> ConditionalSplit1@(NewRow, ExistingMember)"
+					},
+					{
+						"name": "SurrogateKey1",
+						"script": "ConditionalSplit1@NewRow keyGenerate(output(surrogatekey as long),\n\tstartAt: 1L) ~> SurrogateKey1"
+					},
+					{
+						"name": "ColumnSelection",
+						"script": "LookupKeys select(mapColumn(\n\t\tProductID,\n\t\tName,\n\t\tProductNumber,\n\t\tColor = SQLProducts@Color,\n\t\tStandardCost = SQLProducts@StandardCost,\n\t\tListPrice = SQLProducts@ListPrice,\n\t\tSize = SQLProducts@Size,\n\t\tWeight = SQLProducts@Weight,\n\t\tProductKey,\n\t\tProductAlternateKey,\n\t\tProductSubcategoryKey,\n\t\tWeightUnitMeasureCode,\n\t\tSizeUnitMeasureCode,\n\t\tEnglishProductName,\n\t\tSpanishProductName,\n\t\tFrenchProductName,\n\t\tFinishedGoodsFlag,\n\t\tSafetyStockLevel,\n\t\tReorderPoint,\n\t\tSizeRange,\n\t\tDaysToManufacture,\n\t\tProductLine,\n\t\tDealerPrice,\n\t\tClass,\n\t\tStyle,\n\t\tModelName,\n\t\tEnglishDescription,\n\t\tFrenchDescription,\n\t\tChineseDescription,\n\t\tArabicDescription,\n\t\tHebrewDescription,\n\t\tThaiDescription,\n\t\tGermanDescription,\n\t\tJapaneseDescription,\n\t\tTurkishDescription,\n\t\tStartDate,\n\t\tEndDate,\n\t\tStatus\n\t))~> ColumnSelection"
+					},
+					{
+						"name": "SetAttributes",
+						"script": "SurrogateKey1 derive(surrogatekey = concat('abcd', toString(1)),\n\t\tStatus = 'Y',\n\t\tStartDate = currentDate(),\n\t\tEndDate = 1200,\n\t\tNullDesc = toString('  '),\n\t\tmybit = 0) ~> SetAttributes"
+					}
+				]
+			}
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Tweets')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"sources": [
+					{
+						"dataset": {
+							"referenceName": "Tweets",
+							"type": "DatasetReference"
+						},
+						"name": "TweetSource",
+						"script": "source(output(\n\t\tTweetDate as string,\n\t\tTweetTime as string,\n\t\tTweetAuthor as string,\n\t\tTweetText as string\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> TweetSource"
+					}
+				],
+				"sinks": [
+					{
+						"dataset": {
+							"referenceName": "others",
+							"type": "DatasetReference"
+						},
+						"name": "sinkDataInLake",
+						"script": "RankTweets sink(saveMode:'overwrite') ~> sinkDataInLake"
+					}
+				],
+				"transformations": [
+					{
+						"name": "RankTweets",
+						"script": "CountTweets window(over(Category),\n\tdesc(TweetCount, true),\n\ttweet_rank = rank(TweetCount)) ~> RankTweets"
+					},
+					{
+						"name": "DefineCategories",
+						"script": "TweetSource derive(Category = iif (left(TweetText,1)=='@','Mention','Author')) ~> DefineCategories"
+					},
+					{
+						"name": "CountTweets",
+						"script": "DefineCategories aggregate(groupBy(TweetAuthor,\n\t\tCategory),\n\tTweetCount = sum(1)) ~> CountTweets"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/Tweets')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dataflow2')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"sources": [
+					{
+						"dataset": {
+							"referenceName": "DriverShiftTrips",
+							"type": "DatasetReference"
+						},
+						"name": "DriverShiftTrips",
+						"script": "source(output(\n\t\tProp_0 as string,\n\t\tdriverid as string,\n\t\tProp_2 as string,\n\t\tProp_3 as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> DriverShiftTrips"
+					},
+					{
+						"dataset": {
+							"referenceName": "Drivers",
+							"type": "DatasetReference"
+						},
+						"name": "source",
+						"script": "source(output(\n\t\tdriverid as string,\n\t\tProp_1 as string,\n\t\tProp_2 as string,\n\t\tProp_3 as string,\n\t\tProp_4 as string,\n\t\tProp_5 as string,\n\t\tProp_6 as string,\n\t\tphone as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> source"
+					}
+				],
+				"sinks": [
+					{
+						"dataset": {
+							"referenceName": "others",
+							"type": "DatasetReference"
+						},
+						"name": "sink1",
+						"script": "Join1 sink(mapColumn(\n\t\tdriverid = source@driverid,\n\t\tProp_1,\n\t\tProp_2 = source@Prop_2,\n\t\tProp_3 = source@Prop_3,\n\t\tProp_4,\n\t\tProp_5,\n\t\tProp_6,\n\t\tphone,\n\t\tProp_0\n\t),\n\tsaveMode:'overwrite') ~> sink1"
+					}
+				],
+				"transformations": [
+					{
+						"name": "Join1",
+						"script": "source, DriverShiftTrips join(source@driverid == DriverShiftTrips@driverid,\n\tjoinType:'inner',\n\tbroadcast: 'none')~> Join1"
+					}
+				]
+			}
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Tweets2')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"sources": [
+					{
+						"dataset": {
+							"referenceName": "Tweets",
+							"type": "DatasetReference"
+						},
+						"name": "TweetSource",
+						"script": "source(output(\n\t\tTweetDate as string,\n\t\tTweetTime as string,\n\t\tTweetAuthor as string,\n\t\tTweetText as string\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false) ~> TweetSource"
+					}
+				],
+				"sinks": [
+					{
+						"dataset": {
+							"referenceName": "others",
+							"type": "DatasetReference"
+						},
+						"name": "sink1",
+						"script": "SurrogateKey1 sink(mapColumn(\n\t\tTweetDate,\n\t\tTweetTime,\n\t\tTweetAuthor,\n\t\tTweetText,\n\t\tmykey\n\t),\n\tsaveMode:'overwrite') ~> sink1"
+					}
+				],
+				"transformations": [
+					{
+						"name": "SurrogateKey1",
+						"script": "TweetSource keyGenerate(output(mykey as long),\n\tstartAt: 1L) ~> SurrogateKey1"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/Tweets')]"
+			]
+		}
+	]
+}

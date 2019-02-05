@@ -7,6 +7,22 @@
 			"metadata": "Data Factory Name",
 			"defaultValue": "datafloweast"
 		},
+		"Product_Blob_properties_typeProperties_fileName": {
+			"type": "string",
+			"defaultValue": "Product2.csv"
+		},
+		"Product_Blob_properties_typeProperties_folderPath": {
+			"type": "string",
+			"defaultValue": "mycontainer/SampleData/AW"
+		},
+		"Q_Z_properties_typeProperties_fileName": {
+			"type": "string",
+			"defaultValue": ""
+		},
+		"Q_Z_properties_typeProperties_folderPath": {
+			"type": "string",
+			"defaultValue": "mycontainer/output/Q_Z"
+		},
 		"SourceDataset_cce_properties_typeProperties_fileName": {
 			"type": "string",
 			"defaultValue": "customers.json"
@@ -55,6 +71,22 @@
 			"type": "string",
 			"defaultValue": "mycontainer/output/vendorout"
 		},
+		"Tweets_properties_typeProperties_fileName": {
+			"type": "string",
+			"defaultValue": "MikeDoesBigDataTweets.csv"
+		},
+		"Tweets_properties_typeProperties_folderPath": {
+			"type": "string",
+			"defaultValue": "mycontainer/SampleData/USQL"
+		},
+		"TweetsMike_properties_typeProperties_fileName": {
+			"type": "string",
+			"defaultValue": "MikeDoesBigDataTweets.csv"
+		},
+		"TweetsMike_properties_typeProperties_folderPath": {
+			"type": "string",
+			"defaultValue": "mycontainer/SampleData/USQL"
+		},
 		"USDOutput_properties_typeProperties_fileName": {
 			"type": "string",
 			"defaultValue": ""
@@ -62,20 +94,113 @@
 		"USDOutput_properties_typeProperties_folderPath": {
 			"type": "string",
 			"defaultValue": "mycontainer/output/currency"
-		},
-		"blob_params_properties_typeProperties_fileName": {
-			"type": "string",
-			"defaultValue": "params-red.csv"
-		},
-		"blob_params_properties_typeProperties_folderPath": {
-			"type": "string",
-			"defaultValue": "mycontainer/SampleData"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/Product_Blob')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Demos"
+				},
+				"annotations": [],
+				"type": "AzureBlob",
+				"structure": [
+					{
+						"name": "ProductID",
+						"type": "String"
+					},
+					{
+						"name": "Name",
+						"type": "String"
+					},
+					{
+						"name": "ProductNumber",
+						"type": "String"
+					},
+					{
+						"name": "Color",
+						"type": "String"
+					},
+					{
+						"name": "StandardCost",
+						"type": "Decimal"
+					},
+					{
+						"name": "ListPrice",
+						"type": "String"
+					},
+					{
+						"name": "Size",
+						"type": "String"
+					},
+					{
+						"name": "Weight",
+						"type": "String"
+					},
+					{
+						"name": "ProductCategoryID",
+						"type": "String"
+					},
+					{
+						"name": "ProductModelID",
+						"type": "String"
+					}
+				],
+				"typeProperties": {
+					"format": {
+						"type": "TextFormat",
+						"columnDelimiter": ",",
+						"rowDelimiter": "",
+						"quoteChar": "\"",
+						"nullValue": "\\N",
+						"encodingName": null,
+						"treatEmptyAsNull": true,
+						"skipLineCount": 0,
+						"firstRowAsHeader": true
+					},
+					"fileName": "[parameters('Product_Blob_properties_typeProperties_fileName')]",
+					"folderPath": "[parameters('Product_Blob_properties_typeProperties_folderPath')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Q_Z')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureBlob",
+				"typeProperties": {
+					"format": {
+						"type": "TextFormat",
+						"columnDelimiter": ",",
+						"rowDelimiter": "",
+						"nullValue": "\\N",
+						"treatEmptyAsNull": true,
+						"skipLineCount": 0,
+						"firstRowAsHeader": false
+					},
+					"fileName": "[parameters('Q_Z_properties_typeProperties_fileName')]",
+					"folderPath": "[parameters('Q_Z_properties_typeProperties_folderPath')]"
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/SQLDBBaseball1')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
@@ -1224,6 +1349,100 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/Tweets')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureBlob",
+				"structure": [
+					{
+						"name": "TweetDate",
+						"type": "String"
+					},
+					{
+						"name": "TweetTime",
+						"type": "String"
+					},
+					{
+						"name": "TweetAuthor",
+						"type": "String"
+					},
+					{
+						"name": "TweetText",
+						"type": "String"
+					}
+				],
+				"typeProperties": {
+					"format": {
+						"type": "TextFormat",
+						"columnDelimiter": ",",
+						"rowDelimiter": "",
+						"quoteChar": "\"",
+						"nullValue": "\\N",
+						"encodingName": null,
+						"treatEmptyAsNull": true,
+						"skipLineCount": 0,
+						"firstRowAsHeader": false
+					},
+					"fileName": "[parameters('Tweets_properties_typeProperties_fileName')]",
+					"folderPath": "[parameters('Tweets_properties_typeProperties_folderPath')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/TweetsMike')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureBlob",
+				"structure": [
+					{
+						"name": "TweetDate",
+						"type": "String"
+					},
+					{
+						"name": "TweetTime",
+						"type": "String"
+					},
+					{
+						"name": "TweetAuthor",
+						"type": "String"
+					},
+					{
+						"name": "TweetText",
+						"type": "String"
+					}
+				],
+				"typeProperties": {
+					"format": {
+						"type": "TextFormat",
+						"columnDelimiter": ",",
+						"rowDelimiter": "",
+						"quoteChar": "\"",
+						"nullValue": "\\N",
+						"encodingName": null,
+						"treatEmptyAsNull": true,
+						"skipLineCount": 0,
+						"firstRowAsHeader": false
+					},
+					"fileName": "[parameters('TweetsMike_properties_typeProperties_fileName')]",
+					"folderPath": "[parameters('TweetsMike_properties_typeProperties_folderPath')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/USDOutput')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-07-01-preview",
@@ -1249,134 +1468,6 @@
 					},
 					"fileName": "[parameters('USDOutput_properties_typeProperties_fileName')]",
 					"folderPath": "[parameters('USDOutput_properties_typeProperties_folderPath')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/airlines')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-07-01-preview",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureSqlDatabase3",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "Flights"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"structure": [
-					{
-						"name": "Code",
-						"type": "Int32"
-					},
-					{
-						"name": "Airline_Code",
-						"type": "String"
-					}
-				],
-				"typeProperties": {
-					"tableName": "[concat('[', 'dbo].[Airline]')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/airports')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-07-01-preview",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureSqlDatabase3",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "Flights"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"structure": [
-					{
-						"name": "Code",
-						"type": "String"
-					},
-					{
-						"name": "City_Airport",
-						"type": "String"
-					}
-				],
-				"typeProperties": {
-					"tableName": "[concat('[', 'dbo].[Airport]')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/blob_params')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-07-01-preview",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureBlobStorage1",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "Params"
-				},
-				"annotations": [],
-				"type": "AzureBlob",
-				"structure": [
-					{
-						"name": "Prop_0",
-						"type": "String"
-					}
-				],
-				"typeProperties": {
-					"format": {
-						"type": "TextFormat",
-						"columnDelimiter": ",",
-						"rowDelimiter": "",
-						"nullValue": "\\N",
-						"encodingName": null,
-						"treatEmptyAsNull": true,
-						"skipLineCount": 0,
-						"firstRowAsHeader": false
-					},
-					"fileName": "[parameters('blob_params_properties_typeProperties_fileName')]",
-					"folderPath": "[parameters('blob_params_properties_typeProperties_folderPath')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/delays')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-07-01-preview",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureSqlDatabase3",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"structure": [
-					{
-						"name": "carrier",
-						"type": "String"
-					},
-					{
-						"name": "year",
-						"type": "Int32"
-					},
-					{
-						"name": "delays",
-						"type": "Int32"
-					}
-				],
-				"typeProperties": {
-					"tableName": "[concat('[', 'dbo].[delays]')]"
 				}
 			},
 			"dependsOn": []

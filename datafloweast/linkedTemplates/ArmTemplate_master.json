@@ -63,10 +63,6 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'DWDimProd'"
 		},
-		"DataFlowLinkedService1_accessToken": {
-			"type": "secureString",
-			"metadata": "Secure string for 'accessToken' of 'DataFlowLinkedService1'"
-		},
 		"JAN2019_accessToken": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accessToken' of 'JAN2019'"
@@ -219,6 +215,30 @@
 			"type": "string",
 			"defaultValue": "mycontainer/output/sample"
 		},
+		"DriverShiftTrips_properties_typeProperties_fileName": {
+			"type": "string",
+			"defaultValue": "DriverShiftTrips.csv"
+		},
+		"DriverShiftTrips_properties_typeProperties_folderPath": {
+			"type": "string",
+			"defaultValue": "mycontainer/SampleData/USQL/Data/AmbulanceData"
+		},
+		"Drivers_properties_typeProperties_fileName": {
+			"type": "string",
+			"defaultValue": "Drivers.csv"
+		},
+		"Drivers_properties_typeProperties_folderPath": {
+			"type": "string",
+			"defaultValue": "mycontainer/SampleData/USQL/Data/AmbulanceData"
+		},
+		"Drivers2_properties_typeProperties_fileName": {
+			"type": "string",
+			"defaultValue": "Drivers.txt"
+		},
+		"Drivers2_properties_typeProperties_folderPath": {
+			"type": "string",
+			"defaultValue": "mycontainer/SampleData/USQL/Data/AmbulanceData"
+		},
 		"H_P_properties_typeProperties_fileName": {
 			"type": "string",
 			"defaultValue": ""
@@ -306,6 +326,22 @@
 		"TaxiDemoVendorStatsSink_properties_typeProperties_folderPath": {
 			"type": "string",
 			"defaultValue": "mycontainer/output/vendorout"
+		},
+		"Tweets_properties_typeProperties_fileName": {
+			"type": "string",
+			"defaultValue": "MikeDoesBigDataTweets.csv"
+		},
+		"Tweets_properties_typeProperties_folderPath": {
+			"type": "string",
+			"defaultValue": "mycontainer/SampleData/USQL"
+		},
+		"TweetsMike_properties_typeProperties_fileName": {
+			"type": "string",
+			"defaultValue": "MikeDoesBigDataTweets.csv"
+		},
+		"TweetsMike_properties_typeProperties_folderPath": {
+			"type": "string",
+			"defaultValue": "mycontainer/SampleData/USQL"
 		},
 		"USDOutput_properties_typeProperties_fileName": {
 			"type": "string",
@@ -422,30 +458,6 @@
 		"integrationRuntime2_properties_typeProperties_ssisProperties_catalogInfo_catalogAdminPassword": {
 			"type": "secureString"
 		},
-		"Drivers_properties_typeProperties_fileName": {
-			"type": "string",
-			"defaultValue": "Drivers.csv"
-		},
-		"Drivers_properties_typeProperties_folderPath": {
-			"type": "string",
-			"defaultValue": "mycontainer/SampleData/USQL/Data/AmbulanceData"
-		},
-		"DriverShiftTrips_properties_typeProperties_fileName": {
-			"type": "string",
-			"defaultValue": "DriverShiftTrips.csv"
-		},
-		"DriverShiftTrips_properties_typeProperties_folderPath": {
-			"type": "string",
-			"defaultValue": "mycontainer/SampleData/USQL/Data/AmbulanceData"
-		},
-		"Drivers2_properties_typeProperties_fileName": {
-			"type": "string",
-			"defaultValue": "Drivers.txt"
-		},
-		"Drivers2_properties_typeProperties_folderPath": {
-			"type": "string",
-			"defaultValue": "mycontainer/SampleData/USQL/Data/AmbulanceData"
-		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI to storage account containing linked ARM templates"
@@ -472,6 +484,12 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"integrationRuntime_integrationRuntime1": {
+						"value": "[parameters('integrationRuntime_integrationRuntime1')]"
+					},
+					"integrationRuntime_integrationRuntime2": {
+						"value": "[parameters('integrationRuntime_integrationRuntime2')]"
 					},
 					"AzureBlobStorage1_connectionString": {
 						"value": "[parameters('AzureBlobStorage1_connectionString')]"
@@ -500,9 +518,6 @@
 					"DWDimProd_connectionString": {
 						"value": "[parameters('DWDimProd_connectionString')]"
 					},
-					"DataFlowLinkedService1_accessToken": {
-						"value": "[parameters('DataFlowLinkedService1_accessToken')]"
-					},
 					"JAN2019_accessToken": {
 						"value": "[parameters('JAN2019_accessToken')]"
 					},
@@ -526,6 +541,15 @@
 					},
 					"databricksJobCluster_accessToken": {
 						"value": "[parameters('databricksJobCluster_accessToken')]"
+					},
+					"integrationRuntime2_properties_typeProperties_ssisProperties_catalogInfo_catalogServerEndpoint": {
+						"value": "[parameters('integrationRuntime2_properties_typeProperties_ssisProperties_catalogInfo_catalogServerEndpoint')]"
+					},
+					"integrationRuntime2_properties_typeProperties_ssisProperties_catalogInfo_catalogAdminUserName": {
+						"value": "[parameters('integrationRuntime2_properties_typeProperties_ssisProperties_catalogInfo_catalogAdminUserName')]"
+					},
+					"integrationRuntime2_properties_typeProperties_ssisProperties_catalogInfo_catalogAdminPassword": {
+						"value": "[parameters('integrationRuntime2_properties_typeProperties_ssisProperties_catalogInfo_catalogAdminPassword')]"
 					}
 				}
 			},
@@ -545,26 +569,11 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
-					"integrationRuntime_integrationRuntime1": {
-						"value": "[parameters('integrationRuntime_integrationRuntime1')]"
-					},
-					"integrationRuntime_integrationRuntime2": {
-						"value": "[parameters('integrationRuntime_integrationRuntime2')]"
-					},
 					"integrationRuntime_integrationRuntime3": {
 						"value": "[parameters('integrationRuntime_integrationRuntime3')]"
 					},
 					"integrationRuntime_selfhostedir": {
 						"value": "[parameters('integrationRuntime_selfhostedir')]"
-					},
-					"integrationRuntime2_properties_typeProperties_ssisProperties_catalogInfo_catalogServerEndpoint": {
-						"value": "[parameters('integrationRuntime2_properties_typeProperties_ssisProperties_catalogInfo_catalogServerEndpoint')]"
-					},
-					"integrationRuntime2_properties_typeProperties_ssisProperties_catalogInfo_catalogAdminUserName": {
-						"value": "[parameters('integrationRuntime2_properties_typeProperties_ssisProperties_catalogInfo_catalogAdminUserName')]"
-					},
-					"integrationRuntime2_properties_typeProperties_ssisProperties_catalogInfo_catalogAdminPassword": {
-						"value": "[parameters('integrationRuntime2_properties_typeProperties_ssisProperties_catalogInfo_catalogAdminPassword')]"
 					},
 					"A_G_properties_typeProperties_fileName": {
 						"value": "[parameters('A_G_properties_typeProperties_fileName')]"
@@ -676,6 +685,24 @@
 					"DestinationDataset_hii_properties_typeProperties_folderPath": {
 						"value": "[parameters('DestinationDataset_hii_properties_typeProperties_folderPath')]"
 					},
+					"DriverShiftTrips_properties_typeProperties_fileName": {
+						"value": "[parameters('DriverShiftTrips_properties_typeProperties_fileName')]"
+					},
+					"DriverShiftTrips_properties_typeProperties_folderPath": {
+						"value": "[parameters('DriverShiftTrips_properties_typeProperties_folderPath')]"
+					},
+					"Drivers_properties_typeProperties_fileName": {
+						"value": "[parameters('Drivers_properties_typeProperties_fileName')]"
+					},
+					"Drivers_properties_typeProperties_folderPath": {
+						"value": "[parameters('Drivers_properties_typeProperties_folderPath')]"
+					},
+					"Drivers2_properties_typeProperties_fileName": {
+						"value": "[parameters('Drivers2_properties_typeProperties_fileName')]"
+					},
+					"Drivers2_properties_typeProperties_folderPath": {
+						"value": "[parameters('Drivers2_properties_typeProperties_folderPath')]"
+					},
 					"H_P_properties_typeProperties_fileName": {
 						"value": "[parameters('H_P_properties_typeProperties_fileName')]"
 					},
@@ -693,18 +720,6 @@
 					},
 					"PlayersBlob_properties_typeProperties_folderPath": {
 						"value": "[parameters('PlayersBlob_properties_typeProperties_folderPath')]"
-					},
-					"Product_Blob_properties_typeProperties_fileName": {
-						"value": "[parameters('Product_Blob_properties_typeProperties_fileName')]"
-					},
-					"Product_Blob_properties_typeProperties_folderPath": {
-						"value": "[parameters('Product_Blob_properties_typeProperties_folderPath')]"
-					},
-					"Q_Z_properties_typeProperties_fileName": {
-						"value": "[parameters('Q_Z_properties_typeProperties_fileName')]"
-					},
-					"Q_Z_properties_typeProperties_folderPath": {
-						"value": "[parameters('Q_Z_properties_typeProperties_folderPath')]"
 					}
 				}
 			},
@@ -725,6 +740,18 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"Product_Blob_properties_typeProperties_fileName": {
+						"value": "[parameters('Product_Blob_properties_typeProperties_fileName')]"
+					},
+					"Product_Blob_properties_typeProperties_folderPath": {
+						"value": "[parameters('Product_Blob_properties_typeProperties_folderPath')]"
+					},
+					"Q_Z_properties_typeProperties_fileName": {
+						"value": "[parameters('Q_Z_properties_typeProperties_fileName')]"
+					},
+					"Q_Z_properties_typeProperties_folderPath": {
+						"value": "[parameters('Q_Z_properties_typeProperties_folderPath')]"
 					},
 					"SourceDataset_cce_properties_typeProperties_fileName": {
 						"value": "[parameters('SourceDataset_cce_properties_typeProperties_fileName')]"
@@ -762,17 +789,23 @@
 					"TaxiDemoVendorStatsSink_properties_typeProperties_folderPath": {
 						"value": "[parameters('TaxiDemoVendorStatsSink_properties_typeProperties_folderPath')]"
 					},
+					"Tweets_properties_typeProperties_fileName": {
+						"value": "[parameters('Tweets_properties_typeProperties_fileName')]"
+					},
+					"Tweets_properties_typeProperties_folderPath": {
+						"value": "[parameters('Tweets_properties_typeProperties_folderPath')]"
+					},
+					"TweetsMike_properties_typeProperties_fileName": {
+						"value": "[parameters('TweetsMike_properties_typeProperties_fileName')]"
+					},
+					"TweetsMike_properties_typeProperties_folderPath": {
+						"value": "[parameters('TweetsMike_properties_typeProperties_folderPath')]"
+					},
 					"USDOutput_properties_typeProperties_fileName": {
 						"value": "[parameters('USDOutput_properties_typeProperties_fileName')]"
 					},
 					"USDOutput_properties_typeProperties_folderPath": {
 						"value": "[parameters('USDOutput_properties_typeProperties_folderPath')]"
-					},
-					"blob_params_properties_typeProperties_fileName": {
-						"value": "[parameters('blob_params_properties_typeProperties_fileName')]"
-					},
-					"blob_params_properties_typeProperties_folderPath": {
-						"value": "[parameters('blob_params_properties_typeProperties_folderPath')]"
 					}
 				}
 			},
@@ -793,6 +826,12 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"blob_params_properties_typeProperties_fileName": {
+						"value": "[parameters('blob_params_properties_typeProperties_fileName')]"
+					},
+					"blob_params_properties_typeProperties_folderPath": {
+						"value": "[parameters('blob_params_properties_typeProperties_folderPath')]"
 					},
 					"driftout_properties_typeProperties_fileName": {
 						"value": "[parameters('driftout_properties_typeProperties_fileName')]"
@@ -859,24 +898,6 @@
 					},
 					"taxi_trip_fare_input_properties_typeProperties_folderPath": {
 						"value": "[parameters('taxi_trip_fare_input_properties_typeProperties_folderPath')]"
-					},
-					"Drivers_properties_typeProperties_fileName": {
-						"value": "[parameters('Drivers_properties_typeProperties_fileName')]"
-					},
-					"Drivers_properties_typeProperties_folderPath": {
-						"value": "[parameters('Drivers_properties_typeProperties_folderPath')]"
-					},
-					"DriverShiftTrips_properties_typeProperties_fileName": {
-						"value": "[parameters('DriverShiftTrips_properties_typeProperties_fileName')]"
-					},
-					"DriverShiftTrips_properties_typeProperties_folderPath": {
-						"value": "[parameters('DriverShiftTrips_properties_typeProperties_folderPath')]"
-					},
-					"Drivers2_properties_typeProperties_fileName": {
-						"value": "[parameters('Drivers2_properties_typeProperties_fileName')]"
-					},
-					"Drivers2_properties_typeProperties_folderPath": {
-						"value": "[parameters('Drivers2_properties_typeProperties_folderPath')]"
 					}
 				}
 			},

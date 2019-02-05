@@ -44,9 +44,6 @@
 		"DWDimProd_connectionString": {
 			"value": ""
 		},
-		"DataFlowLinkedService1_accessToken": {
-			"value": ""
-		},
 		"JAN2019_accessToken": {
 			"value": ""
 		},
@@ -161,6 +158,24 @@
 		"DestinationDataset_hii_properties_typeProperties_folderPath": {
 			"value": "mycontainer/output/sample"
 		},
+		"DriverShiftTrips_properties_typeProperties_fileName": {
+			"value": "DriverShiftTrips.csv"
+		},
+		"DriverShiftTrips_properties_typeProperties_folderPath": {
+			"value": "mycontainer/SampleData/USQL/Data/AmbulanceData"
+		},
+		"Drivers_properties_typeProperties_fileName": {
+			"value": "Drivers.csv"
+		},
+		"Drivers_properties_typeProperties_folderPath": {
+			"value": "mycontainer/SampleData/USQL/Data/AmbulanceData"
+		},
+		"Drivers2_properties_typeProperties_fileName": {
+			"value": "Drivers.txt"
+		},
+		"Drivers2_properties_typeProperties_folderPath": {
+			"value": "mycontainer/SampleData/USQL/Data/AmbulanceData"
+		},
 		"H_P_properties_typeProperties_fileName": {
 			"value": ""
 		},
@@ -226,6 +241,18 @@
 		},
 		"TaxiDemoVendorStatsSink_properties_typeProperties_folderPath": {
 			"value": "mycontainer/output/vendorout"
+		},
+		"Tweets_properties_typeProperties_fileName": {
+			"value": "MikeDoesBigDataTweets.csv"
+		},
+		"Tweets_properties_typeProperties_folderPath": {
+			"value": "mycontainer/SampleData/USQL"
+		},
+		"TweetsMike_properties_typeProperties_fileName": {
+			"value": "MikeDoesBigDataTweets.csv"
+		},
+		"TweetsMike_properties_typeProperties_folderPath": {
+			"value": "mycontainer/SampleData/USQL"
 		},
 		"USDOutput_properties_typeProperties_fileName": {
 			"value": ""
@@ -313,24 +340,6 @@
 		},
 		"integrationRuntime2_properties_typeProperties_ssisProperties_catalogInfo_catalogAdminPassword": {
 			"value": ""
-		},
-		"Drivers_properties_typeProperties_fileName": {
-			"value": "Drivers.csv"
-		},
-		"Drivers_properties_typeProperties_folderPath": {
-			"value": "mycontainer/SampleData/USQL/Data/AmbulanceData"
-		},
-		"DriverShiftTrips_properties_typeProperties_fileName": {
-			"value": "DriverShiftTrips.csv"
-		},
-		"DriverShiftTrips_properties_typeProperties_folderPath": {
-			"value": "mycontainer/SampleData/USQL/Data/AmbulanceData"
-		},
-		"Drivers2_properties_typeProperties_fileName": {
-			"value": "Drivers.txt"
-		},
-		"Drivers2_properties_typeProperties_folderPath": {
-			"value": "mycontainer/SampleData/USQL/Data/AmbulanceData"
 		}
 	}
 }

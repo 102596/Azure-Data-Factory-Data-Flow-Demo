@@ -7,16 +7,6 @@
 			"metadata": "Data Factory Name",
 			"defaultValue": "datafloweast"
 		},
-		"integrationRuntime_integrationRuntime1": {
-			"type": "string",
-			"metadata": "Integration Runtime Name",
-			"defaultValue": "integrationRuntime1"
-		},
-		"integrationRuntime_integrationRuntime2": {
-			"type": "string",
-			"metadata": "Integration Runtime Name",
-			"defaultValue": "integrationRuntime2"
-		},
 		"integrationRuntime_integrationRuntime3": {
 			"type": "string",
 			"metadata": "Integration Runtime Name",
@@ -26,17 +16,6 @@
 			"type": "string",
 			"metadata": "Integration Runtime Name",
 			"defaultValue": "selfhostedir"
-		},
-		"integrationRuntime2_properties_typeProperties_ssisProperties_catalogInfo_catalogServerEndpoint": {
-			"type": "string",
-			"defaultValue": "makssis002.database.windows.net"
-		},
-		"integrationRuntime2_properties_typeProperties_ssisProperties_catalogInfo_catalogAdminUserName": {
-			"type": "string",
-			"defaultValue": "kromerm"
-		},
-		"integrationRuntime2_properties_typeProperties_ssisProperties_catalogInfo_catalogAdminPassword": {
-			"type": "secureString"
 		},
 		"A_G_properties_typeProperties_fileName": {
 			"type": "string",
@@ -84,50 +63,6 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/', parameters('integrationRuntime_integrationRuntime1'))]",
-			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
-			"apiVersion": "2018-07-01-preview",
-			"properties": {
-				"type": "SelfHosted",
-				"typeProperties": {}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/', parameters('integrationRuntime_integrationRuntime2'))]",
-			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
-			"apiVersion": "2018-07-01-preview",
-			"properties": {
-				"type": "Managed",
-				"typeProperties": {
-					"computeProperties": {
-						"location": "West US 2",
-						"nodeSize": "Standard_D4_v2",
-						"numberOfNodes": 2,
-						"maxParallelExecutionsPerNode": 1,
-						"vNetProperties": {
-							"vNetId": "/subscriptions/1e42591f-1f0c-4c5a-b7f2-a268f6105ec5/resourceGroups/SKResourceGroup/providers/Microsoft.Network/virtualNetworks/MyLinuxVMVNET",
-							"subnet": "MyLinuxVMSubnet"
-						}
-					},
-					"ssisProperties": {
-						"catalogInfo": {
-							"catalogServerEndpoint": "[parameters('integrationRuntime2_properties_typeProperties_ssisProperties_catalogInfo_catalogServerEndpoint')]",
-							"catalogAdminUserName": "[parameters('integrationRuntime2_properties_typeProperties_ssisProperties_catalogInfo_catalogAdminUserName')]",
-							"catalogAdminPassword": {
-								"type": "SecureString",
-								"value": "[parameters('integrationRuntime2_properties_typeProperties_ssisProperties_catalogInfo_catalogAdminPassword')]"
-							},
-							"catalogPricingTier": "S0"
-						},
-						"edition": "Standard",
-						"licenseType": "BasePrice"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/', parameters('integrationRuntime_integrationRuntime3'))]",
 			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
 			"apiVersion": "2018-07-01-preview",
@@ -144,6 +79,20 @@
 			"properties": {
 				"type": "SelfHosted",
 				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SCD Dataflow 2')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Demos"
+				},
+				"sources": [],
+				"sinks": [],
+				"transformations": []
 			},
 			"dependsOn": []
 		},
@@ -1182,6 +1131,26 @@
 				],
 				"typeProperties": {
 					"tableName": "[concat('[', 'dbo].[Flight]')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/BaseballADW')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-07-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDW1",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Baseball"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"typeProperties": {
+					"tableName": "BaseballBatting"
 				}
 			},
 			"dependsOn": []
